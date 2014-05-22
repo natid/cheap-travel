@@ -1,3 +1,4 @@
+#!/usr/bin/python
 '''
 Created on May 15, 2014
 
@@ -22,21 +23,19 @@ demo_request_json = {
             "PassengerTypes": [{"TypeId": 1, "PaxType": "Adult"}],
             "TripSegments": [],
             "Preferences": {"CheckAvailability": "true"},
-            "Channels": [{"Id": 1, "Provider": "Amadeus"}],
+            "Channels": [{"Id": 1, "Provider": "Amadeus"},
+                         {"Id": 2, "Provider": "WorldSpan"},
+                         {"Id": 3, "Provider": "Galileo"},
+                         {"Id": 4, "Provider": "Sabre"},
+                         {"Id": 5, "Provider": "Apollo"},
+                         {"Id": 6, "Provider": "DirectConnect"},
+                         {"Id": 7, "Provider": "Pyton"}],
             "Suppliers": [{
                               "Id": 1,
                               "PointOfSale": "US",
                               "SearchRules": [{"FareType": "All", "Airline": ["All"], "ChannelID": 1}]
                           }]
         }
-}
-
-demo_trip = {
-    "Id": 1,
-    "SegmentPassengers": {"PassengerGroups": [{"Members": [{"Id": 1, "TypeId": 1, "Cabin": "Any"}]}]},
-    "Origin": [],
-    "Destination": [],
-    "DepartureDates": []
 }
 
 
@@ -46,7 +45,7 @@ def build_trip(origin, dest, date, trip_id=1):
     trip["SegmentPassengers"] = {"PassengerGroups": [{"Members": [{"Id": 1, "TypeId": 1, "Cabin": "Any"}]}]}
     trip["Origin"].append(origin)
     trip["Destination"].append(dest)
-    trip["DepartureDates"].append({"Date" : date})
+    trip["DepartureDates"].append({"Date": date})
     return trip
 
 
@@ -73,7 +72,6 @@ def get_price(resp):
     return resp['Journeys'][0][0]['Price']['Total']['Amount']
 
 
-
 def single_check(origin, dest):
     single_trip = build_trip(origin, dest, "2014-12-18")
 
@@ -95,8 +93,6 @@ def single_check(origin, dest):
         return
     two_way_price = get_price(trip_data)
 
-
-
     if go_price + ret_price < two_way_price:
         print origin + "->" + dest + "->" + origin + ":"
         print "go", go_price
@@ -116,7 +112,3 @@ if __name__ == "__main__":
             if dest != origin:
                 t = Thread(target=single_check, args=(origin, dest))
                 t.start()
-                #single_check(origin, dest)
-        #pprint.pprint( resp['Journeys'][0][0]['Price']['Total']['Amount'])
-
-        #pprint.pprint(json.dumps(resp)[0:100])
