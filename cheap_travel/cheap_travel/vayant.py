@@ -8,11 +8,11 @@ Created on May 15, 2014
 import json
 import urllib2
 import hashlib
-import pprint
-import copy
-import sys
 from collections import defaultdict
-from threading import Thread
+import threading
+import time
+
+import utils
 
 demo_request_json = {
     "SearchRequest":
@@ -22,7 +22,7 @@ demo_request_json = {
             "ResponseType": "json",
             "PassengerTypes": [{"TypeId": 1, "PaxType": "Adult"}],
             "TripSegments": [],
-            "Preferences": {"CheckAvailability": "true"},
+            "Preferences": {"CheckAvailability": "true",}, #"SplitTickets": { "AllowSplitTickets": "true" },},
             "Channels": [{"Id": 1, "Provider": "Amadeus"},
                          {"Id": 2, "Provider": "WorldSpan"},
                          {"Id": 3, "Provider": "Galileo"},
@@ -68,47 +68,48 @@ def call_vayant(trip):
     return resp
 
 
-def get_price(resp):
-    return resp['Journeys'][0][0]['Price']['Total']['Amount']
-
 
 def single_check(origin, dest):
+
     single_trip = build_trip(origin, dest, "2014-12-18")
 
     second_trip = build_trip(dest, origin, "2014-12-25")
 
-    trip_data = call_vayant([single_trip])
-    if not trip_data:
+    go_trip_data = call_vayant([single_trip])
+    if not go_trip_data:
         return
-    go_price = get_price(trip_data)
+    go_price = utils.get_price(go_trip_data)
 
-    trip_data = call_vayant([second_trip])
-    if not trip_data:
+    return_trip_data = call_vayant([second_trip])
+    if not return_trip_data:
         return
-    ret_price = get_price(trip_data)
+    ret_price = utils.get_price(return_trip_data)
 
     second_trip = build_trip(dest, origin, "2014-12-25", 2)
-    trip_data = call_vayant([single_trip, second_trip])
-    if not trip_data:
+    two_way_trip_data = call_vayant([single_trip, second_trip])
+    if not two_way_trip_data:
         return
-    two_way_price = get_price(trip_data)
+    two_way_price = utils.get_price(two_way_trip_data)
 
-    if go_price + ret_price < two_way_price:
+    if go_price + ret_price  < two_way_price:
         print origin + "->" + dest + "->" + origin + ":"
-        print "go", go_price
-        print "ret", ret_price
-        print "two way", two_way_price
-        print "diff", two_way_price - (go_price + ret_price)
+        utils.print_trip(go_trip_data)
+        utils.print_trip(return_trip_data)
+        utils.print_trip(two_way_trip_data)
 
-    print "END"
+   # print "END"
 
 
 if __name__ == "__main__":
 
-    origins = ["TLV", "LON", "NYC", "MAN", "LAX", "WAS", "BKK"]
-
+    origins = ["TLV", "LON", "NYC", "MAN", "LAX", "WAS", "BKK", "ZAG"]
     for origin in origins:
         for dest in origins:
             if dest != origin:
-                t = Thread(target=single_check, args=(origin, dest))
+                #single_check(origin, dest)
+                while threading.activeCount() > 20:
+                    time.sleep(5)
+                t = threading.Thread(target=single_check, args=(str(origin).upper(), str(dest).upper()))
                 t.start()
+
+    #single_check("MAN", "NYC")
