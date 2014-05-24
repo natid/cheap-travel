@@ -8,9 +8,6 @@ Created on May 15, 2014
 import json
 import urllib2
 import hashlib
-import pprint
-import copy
-import sys
 from collections import defaultdict
 from threading import Thread
 
@@ -68,8 +65,20 @@ def call_vayant(trip):
     return resp
 
 
-def get_price(resp):
+def _extract_cheapest_price(resp):
     return resp['Journeys'][0][0]['Price']['Total']['Amount']
+
+
+def get_price(origin, dest, depart_date, arrive_date):
+    first_trip = build_trip(origin, dest, depart_date, 1)
+    second_trip = build_trip(dest, origin, arrive_date, 2)
+    trip_data = call_vayant([first_trip, second_trip])
+
+    if not trip_data:
+        return
+
+    return _extract_cheapest_price(trip_data)
+
 
 
 def single_check(origin, dest):
@@ -80,18 +89,18 @@ def single_check(origin, dest):
     trip_data = call_vayant([single_trip])
     if not trip_data:
         return
-    go_price = get_price(trip_data)
+    go_price = _extract_cheapest_price(trip_data)
 
     trip_data = call_vayant([second_trip])
     if not trip_data:
         return
-    ret_price = get_price(trip_data)
+    ret_price = _extract_cheapest_price(trip_data)
 
     second_trip = build_trip(dest, origin, "2014-12-25", 2)
     trip_data = call_vayant([single_trip, second_trip])
     if not trip_data:
         return
-    two_way_price = get_price(trip_data)
+    two_way_price = _extract_cheapest_price(trip_data)
 
     if go_price + ret_price < two_way_price:
         print origin + "->" + dest + "->" + origin + ":"
@@ -105,7 +114,8 @@ def single_check(origin, dest):
 
 if __name__ == "__main__":
 
-    origins = ["TLV", "LON", "NYC", "MAN", "LAX", "WAS", "BKK"]
+    #origins = ["TLV", "LON", "NYC", "MAN", "LAX", "WAS", "BKK"]
+    origins = ["TLV", "LON"]
 
     for origin in origins:
         for dest in origins:
