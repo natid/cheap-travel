@@ -4,6 +4,9 @@ __author__ = 'magenn'
 import pprint
 import csv
 from collections import defaultdict
+import threading
+import time
+
 
 airlines=defaultdict()
 with open('airlines.csv', 'rb') as csvfile:
@@ -41,12 +44,12 @@ def print_single_flight(flight):
             print "\t carrier: " + leg["OperatingCarrier"]
 
 def get_connections_list(trip):
-    connection=set()
+    connections=set()
     for single in trip['Journeys']:
         if len(single[0]["Flights"]) == 2 :
             if single[0]["Flights"][0]["Destination"] == single[0]["Flights"][1]["Origin"]:
-                connection.add(single[0]["Flights"][0]["Destination"])
-    return connection
+                connections.add(single[0]["Flights"][0]["Destination"])
+    return connections
 
 def read_airport_codes_from_csv():
     origins=[]
@@ -61,3 +64,16 @@ def read_airport_codes_from_csv():
 
     return origins
 
+def get_connections(origins, dests, func):
+
+    for origin in origins:
+         for dest in dests:
+            if dest != origin:
+                #single_check(origin, dest)
+                while threading.activeCount() > 20:
+                    time.sleep(5)
+                t = threading.Thread(target=func, args=(str(origin).upper(), str(dest).upper()))
+                t.start()
+
+    while threading.activeCount() > 1:
+        time.sleep(10)

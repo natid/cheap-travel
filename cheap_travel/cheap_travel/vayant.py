@@ -11,8 +11,10 @@ import hashlib
 from collections import defaultdict
 import threading
 import time
-
+import pprint
 import utils
+
+connection=set()
 
 demo_request_json = {
     "SearchRequest":
@@ -71,6 +73,7 @@ def call_vayant(trip):
 
 def single_check(origin, dest):
 
+    global connection
     single_trip = build_trip(origin, dest, "2014-12-18")
 
     second_trip = build_trip(dest, origin, "2014-12-25")
@@ -97,19 +100,16 @@ def single_check(origin, dest):
         utils.print_trip(return_trip_data)
         utils.print_trip(two_way_trip_data)
 
+    connection = connection.union(utils.get_connections_list(go_trip_data))
+
    # print "END"
 
 
 if __name__ == "__main__":
+    origins = ["LON", "AMS", "BER", "ROM", "PAR"]
+    dests = ["BKK", "MNL", "HKG"]
 
-    origins = ["TLV", "LON", "NYC", "MAN", "LAX", "WAS", "BKK", "ZAG"]
-    for origin in origins:
-        for dest in origins:
-            if dest != origin:
-                #single_check(origin, dest)
-                while threading.activeCount() > 20:
-                    time.sleep(5)
-                t = threading.Thread(target=single_check, args=(str(origin).upper(), str(dest).upper()))
-                t.start()
+    utils.get_connections(origins,dests, single_check)
+    print connection
 
-    #single_check("MAN", "NYC")
+
