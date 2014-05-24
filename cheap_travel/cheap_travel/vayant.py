@@ -73,7 +73,7 @@ def call_vayant(trip):
 def _extract_cheapest_price(resp):
     return resp['Journeys'][0][0]['Price']['Total']['Amount']
 
-def get_price(origin, dest, depart_date, arrive_date):
+def get_price_round_trip(origin, dest, depart_date, arrive_date):
     first_trip = build_trip(origin, dest, depart_date, 1)
     second_trip = build_trip(dest, origin, arrive_date, 2)
     trip_data = call_vayant([first_trip, second_trip])
@@ -83,9 +83,17 @@ def get_price(origin, dest, depart_date, arrive_date):
 
     return _extract_cheapest_price(trip_data)
 
+def get_price_one_way(origin, dest, depart_date):
+    first_trip = build_trip(origin, dest, depart_date, 1)
+    trip_data = call_vayant([first_trip])
 
+    if not trip_data:
+        return
+
+    return _extract_cheapest_price(trip_data)
 
 def single_check(origin, dest):
+    global connection
     single_trip = build_trip(origin, dest, "2014-12-18")
 
     second_trip = build_trip(dest, origin, "2014-12-25")
