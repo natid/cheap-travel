@@ -6,7 +6,7 @@ import csv
 from collections import defaultdict
 
 airlines=defaultdict()
-with open('c:\\airlines.csv', 'rb') as csvfile:
+with open('airlines.csv', 'rb') as csvfile:
     reader = csv.reader(csvfile, delimiter=',', quotechar='|')
     for row in reader:
         try:
@@ -50,7 +50,7 @@ def get_connections_list(trip):
 
 def read_airport_codes_from_csv():
     origins=[]
-    with open('c:\\airport-codes.csv', 'rb') as csvfile:
+    with open('airport-codes.csv', 'rb') as csvfile:
         reader = csv.reader(csvfile, delimiter=' ', quotechar='|')
         for row in reader:
             try:
