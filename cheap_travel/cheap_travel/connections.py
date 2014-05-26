@@ -1,7 +1,8 @@
+import threading
 from vayant import get_price_round_trip, get_price_one_way
 from datetime import date, timedelta
 from threading import Thread
-
+import time
 
 def _create_str_date(date):
     return date.strftime("%Y-%m-%d")
@@ -115,12 +116,21 @@ arrive_date = depart_date + timedelta(days=21)
 
 for dest in dest_list:
     for connection in connections_list:
-        t = Thread(target=check_for_origins, args=(origin_list, dest, connection))
-        t.start()
-        threads.append(t)
 
-for t in threads:
-    t.join()
+        while threading.activeCount() > 20:
+            time.sleep(5)
+        t = threading.Thread(target=check_for_origins,  args=(origin_list, dest, connection))
+        t.start()
+
+while threading.activeCount() > 1:
+    time.sleep(10)
+
+#         t = Thread(target=check_for_origins, args=(origin_list, dest, connection))
+#         t.start()
+#         threads.append(t)
+#
+# for t in threads:
+#     t.join()
 
 print final_prices
 
