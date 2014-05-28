@@ -81,7 +81,7 @@ def get_price_round_trip(origin, dest, depart_date, arrive_date):
     if not trip_data:
         return
 
-    return _extract_cheapest_price(trip_data)
+    return _extract_cheapest_price(trip_data), trip_data['Journeys'][0][0]
 
 def get_price_one_way(origin, dest, depart_date):
     first_trip = build_trip(origin, dest, depart_date, 1)
@@ -90,7 +90,7 @@ def get_price_one_way(origin, dest, depart_date):
     if not trip_data:
         return
 
-    return _extract_cheapest_price(trip_data)
+    return _extract_cheapest_price(trip_data), trip_data['Journeys'][0][0]
 
 def single_check(origin, dest):
     global connection
