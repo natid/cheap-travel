@@ -21,13 +21,15 @@ def check_flights(origin, dest, connection):
     # round trip:
     price, round_trip_data = get_price_round_trip(origin, dest, _create_str_date(depart_date), _create_str_date(arrive_date))
     data = ("Round Trip", price, [round_trip_data])
-    prices.append(data)
+    if price:
+        prices.append(data)
 
     # two one ways
     price1, trip_data1 = get_price_one_way(origin, dest, _create_str_date(depart_date))
     price2, trip_data2 = get_price_one_way(dest, origin, _create_str_date(arrive_date))
     data = ( "Two one ways",price1+price2,[trip_data1, trip_data2])
-    prices.append(data)
+    if price1 and price2:
+        prices.append(data)
 
     # connection in the beginning of the trip
     for i in range(4):
@@ -38,9 +40,9 @@ def check_flights(origin, dest, connection):
         price2, trip_data2 = get_price_one_way(connection, dest, _create_str_date(depart_from_connection_date))
         price3, trip_data3 = get_price_one_way(connection, dest, _create_str_date(arrive_date))
 
-
-        data = ("Connection in beginning in {} at {}".format(connection, depart_from_connection_date), price1 + price2 + price3, [trip_data1, trip_data2, trip_data3] )
-        prices.append(data)
+        if price1 and price2 and price3 :
+            data = ("Connection in beginning in {} at {}".format(connection, depart_from_connection_date), price1 + price2 + price3, [trip_data1, trip_data2, trip_data3] )
+            prices.append(data)
 
     # connection in the end of the trip
     for i in range(4):
@@ -50,9 +52,9 @@ def check_flights(origin, dest, connection):
         price1, trip_data1 = get_price_one_way(origin, dest, _create_str_date(depart_date))
         price2, trip_data2 = get_price_one_way(dest, connection , _create_str_date(depart_from_dest_date))
         price3, trip_data3 = get_price_one_way(connection, origin, _create_str_date(arrive_date))
-
-        data = ("Connection in the end in {} at {}".format(connection, depart_from_dest_date), price1 + price2 + price3, [trip_data1, trip_data2, trip_data3] )
-        prices.append(data)
+        if price1 and price2 and price3 :
+            data = ("Connection in the end in {} at {}".format(connection, depart_from_dest_date), price1 + price2 + price3, [trip_data1, trip_data2, trip_data3] )
+            prices.append(data)
 
     # Two Connections stay in the beginning
     for i in range(4):
@@ -61,9 +63,9 @@ def check_flights(origin, dest, connection):
 
         price1, trip_data1 = get_price_round_trip(origin, connection, _create_str_date(depart_date), _create_str_date(arrive_date))
         price2, trip_data2 = get_price_round_trip(connection, dest, _create_str_date(depart_from_connection_date), _create_str_date(arrive_date))
-
-        data = ("Two Connections stay in the beginning in {} at {}".format(connection, depart_from_connection_date), price1 + price2, [trip_data1, trip_data2]  )
-        prices.append(data)
+        if price1 and price2 :
+            data = ("Two Connections stay in the beginning in {} at {}".format(connection, depart_from_connection_date), price1 + price2, [trip_data1, trip_data2]  )
+            prices.append(data)
 
     # Two Connections stay in the end
     for i in range(4):
@@ -72,18 +74,19 @@ def check_flights(origin, dest, connection):
 
         price1, trip_data1 = get_price_round_trip(origin, connection, _create_str_date(depart_date), _create_str_date(depart_from_dest_date))
         price2, trip_data2 = get_price_round_trip(connection, dest, _create_str_date(depart_date), _create_str_date(arrive_date))
+        if price1 and price2 :
+            data = ("Two Connections stay in the end in {} at {}".format(connection, depart_from_connection_date), price1 + price2,[trip_data1, trip_data2] )
+            prices.append(data)
 
-        data = ("Two Connections stay in the end in {} at {}".format(connection, depart_from_connection_date), price1 + price2,[trip_data1, trip_data2] )
-        prices.append(data)
+    if prices:
+        min_price = min(prices, key=lambda x: x[1])
+        dict_key = "%s-%s" % (origin, dest)
 
-    min_price = min(prices, key=lambda x: x[1])
-    dict_key = "%s-%s" % (origin, dest)
-
-    if final_prices.has_key(dict_key):
-        if final_prices[dict_key][1] > min_price[1]:
+        if final_prices.has_key(dict_key):
+            if final_prices[dict_key][1] > min_price[1]:
+                final_prices[dict_key] = min_price
+        else:
             final_prices[dict_key] = min_price
-    else:
-        final_prices[dict_key] = min_price
     """
     print "="*30
     print "MIN from %s to %s via %s is %s" % (origin, dest, connection, min_price[0])
@@ -127,8 +130,8 @@ while threading.activeCount() > 1:
 # for t in threads:
 #     t.join()
 
-for _,price in final_prices.iteritems():
-    print "{}, price = {}, flights information is: \n".format(price[0], price[1])
+for cities,price in final_prices.iteritems():
+    print "{}, {}, price = {}, flights information is: \n".format(cities, price[0], price[1])
     for flight in price[2]:
         utils.print_single_flight(flight)
 

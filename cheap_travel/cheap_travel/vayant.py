@@ -52,11 +52,12 @@ def build_trip(origin, dest, date, trip_id=1):
 
 
 def call_vayant(trip):
-    demo_request_json["SearchRequest"]["TripSegments"] = trip
+    request_json = demo_request_json.copy()
+    request_json["SearchRequest"]["TripSegments"] = trip
 
     header = {"Content-Type": "application/JSON "}
 
-    req = urllib2.Request("http://fs-json.demo.vayant.com:7080/", data=json.dumps(demo_request_json), headers=header)
+    req = urllib2.Request("http://fs-json.demo.vayant.com:7080/", data=json.dumps(request_json), headers=header)
 
     json_resp = urllib2.urlopen(req)
 
@@ -79,7 +80,8 @@ def get_price_round_trip(origin, dest, depart_date, arrive_date):
     trip_data = call_vayant([first_trip, second_trip])
 
     if not trip_data:
-        return
+        return (None, None)
+
 
     return _extract_cheapest_price(trip_data), trip_data['Journeys'][0][0]
 
@@ -88,7 +90,7 @@ def get_price_one_way(origin, dest, depart_date):
     trip_data = call_vayant([first_trip])
 
     if not trip_data:
-        return
+        return (None, None)
 
     return _extract_cheapest_price(trip_data), trip_data['Journeys'][0][0]
 
