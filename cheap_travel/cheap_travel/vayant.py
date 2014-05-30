@@ -15,6 +15,7 @@ import pprint
 import utils
 from StringIO import StringIO
 import gzip
+import zlib
 
 
 connection=set()
@@ -64,13 +65,19 @@ def call_vayant(trip):
 
     response = urllib2.urlopen(req)
 
-    if response.info().get('Content-Encoding') == 'gzip':
-        print response
-        buf = StringIO( response)
-        f = gzip.GzipFile(fileobj=buf)
-        json_resp = f.read()
 
-    resp = json.load(json_resp)
+    d = zlib.decompressobj(16+zlib.MAX_WBITS)
+
+    json_resp = ""
+
+    while True:
+        data = response.read(10000)
+        if not data: break
+        if response.info().get('Content-Encoding') == 'gzip':
+            data = d.decompress(data)
+        json_resp += data
+
+    resp = json.loads(json_resp)
 
     if resp.has_key('Response') and resp['Response'] == 'Error':
         print "ERROR!!!"+ resp['Message']
@@ -139,7 +146,10 @@ if __name__ == "__main__":
     origins = ["LON", "AMS", "BER", "ROM", "PAR"]
     dests = ["BKK", "MNL", "HKG"]
 
+    start = time.time()
     utils.get_connections(origins,dests, single_check)
     print connection
+    print time.time() - start
+
 
 
