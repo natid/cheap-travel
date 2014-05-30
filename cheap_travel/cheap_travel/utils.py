@@ -77,3 +77,10 @@ def get_connections(origins, dests, func):
 
     while threading.activeCount() > 1:
         time.sleep(10)
+
+def _create_str_date(date):
+    return date.strftime("%Y-%m-%d")
+
+# def print_flight(origin, connection, dest, depart_date, arrive_date, price, flight_type):
+#     print "{0} -> {1} from {2} to {3}".format(origin, connection, depart_date, arrive_date)
+#     print "{0} -> {1} from {2} to {3}".format(connection, dest, depart_date, arrive_date)

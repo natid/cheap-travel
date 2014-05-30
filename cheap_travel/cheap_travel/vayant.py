@@ -13,6 +13,9 @@ import threading
 import time
 import pprint
 import utils
+from StringIO import StringIO
+import gzip
+
 
 connection=set()
 
@@ -55,19 +58,24 @@ def call_vayant(trip):
     request_json = demo_request_json.copy()
     request_json["SearchRequest"]["TripSegments"] = trip
 
-    header = {"Content-Type": "application/JSON "}
+    header = {"Content-Type": "application/JSON ", "Accept-encoding": "gzip"}
 
     req = urllib2.Request("http://fs-json.demo.vayant.com:7080/", data=json.dumps(request_json), headers=header)
 
-    json_resp = urllib2.urlopen(req)
+    response = urllib2.urlopen(req)
+
+    if response.info().get('Content-Encoding') == 'gzip':
+        print response
+        buf = StringIO( response)
+        f = gzip.GzipFile(fileobj=buf)
+        json_resp = f.read()
 
     resp = json.load(json_resp)
 
     if resp.has_key('Response') and resp['Response'] == 'Error':
-        print "ERROR!!!"
-        print resp['Message']
+        print "ERROR!!!"+ resp['Message']
+        print trip
         return None
-
     return resp
 
 
