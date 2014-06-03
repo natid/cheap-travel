@@ -1,20 +1,22 @@
 import threading
 from datetime import date, timedelta
 import time
+from cheap_travel.flight_checks import FlightChecker
 import utils
 import flight_checks
 
 final_prices = {}
 
 def check_flights(origin, dest, connection, depart_date, return_date):
+    flight_checker = FlightChecker()
     global final_prices
     prices = []
-    test_list = (flight_checks.check_round_trip,
-                 flight_checks.check_two_one_ways,
-                 flight_checks.check_connection_in_the_beginning,
-                 flight_checks.check_connection_in_the_end,
-                 flight_checks.check_two_connections_stay_in_the_beginning,
-                 flight_checks.check_two_connections_stay_in_the_end)
+    test_list = (flight_checker.check_round_trip,
+                 flight_checker.check_two_one_ways,
+                 flight_checker.check_connection_in_the_beginning,
+                 flight_checker.check_connection_in_the_end,
+                 flight_checker.check_two_connections_stay_in_the_beginning,
+                 flight_checker.check_two_connections_stay_in_the_end)
 
     for test in test_list:
         data = test(origin, dest, depart_date, return_date, connection)
@@ -48,7 +50,7 @@ if __name__ == "__main__":
     return_date = depart_date + timedelta(days=21)
 
     progress=0
-    total_options = len(dest_list) * len(origin_list) * len(connections_list)
+    total_options = len(dest_list) * len(connections_list)
     for dest in dest_list:
         for single_connection in connections_list:
 

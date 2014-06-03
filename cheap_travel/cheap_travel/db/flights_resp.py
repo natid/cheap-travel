@@ -7,9 +7,23 @@ class FlightsRespDAL(object):
         db = client.flights_db
         self.flights_collection = db.flights_collection
 
-    def save_data(self, key, data):
-        data['key'] = key
-        self.flights_collection.insert(data)
+    def set(self, key, data):
+        self.remove(key)
 
-    def get_data(self, key):
-        return self.flights_collection.find_one({"key": key})
+        new_dict = {}
+        new_dict['key'] = key
+        new_dict['value'] = data
+        self.flights_collection.insert(new_dict)
+
+    def get(self, key):
+        data = self.flights_collection.find_one({"key": key})
+        if data:
+            return data['value']
+        else:
+            return
+
+    def has_key(self, key):
+        return self.flights_collection.find_one({"key": key}) is not None
+
+    def remove(self, key):
+        self.flights_collection.remove({"key": key})
