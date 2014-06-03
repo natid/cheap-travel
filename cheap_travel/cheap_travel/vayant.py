@@ -1,10 +1,3 @@
-#!/usr/bin/python
-'''
-Created on May 15, 2014
-
-@author: magenn
-'''
-
 import json
 import urllib2
 import hashlib
@@ -14,7 +7,7 @@ import utils
 import zlib
 import bl
 
-trips_cache=defaultdict()
+trips_cache = defaultdict()
 
 demo_request_json = {
     "SearchRequest":
@@ -59,14 +52,15 @@ def build_trip(origin, dest, dates, trip_id=1):
     return trip
 
 def create_cache_key_from_trip(trip):
-    key=""
+    key = ""
     for single_trip in trip:
-        key += single_trip["Origin"][0] +"-"
-        key += single_trip["Destination"][0] +"-"
+        key += single_trip["Origin"][0] + "-"
+        key += single_trip["Destination"][0] + "-"
         for date in single_trip["DepartureDates"]:
             key += date["Date"] + "-"
-        key+=":"
+        key += ":"
     return key
+
 
 def decompress_and_extract_json(response):
     decompressor = zlib.decompressobj(16+zlib.MAX_WBITS)
@@ -81,6 +75,8 @@ def decompress_and_extract_json(response):
         json_resp += data
 
     return json.loads(json_resp)
+
+
 def call_vayant(trip):
     key = create_cache_key_from_trip(trip)
 
@@ -118,7 +114,7 @@ if __name__ == "__main__":
     dests = ["BKK", "MNL", "HKG"]
 
     start = time.time()
-    connection = utils.get_all_connections(origins,dests, bl.get_connections)
+    connection = utils.get_all_connections(origins, dests, bl.get_connections)
     print connection
 
 
