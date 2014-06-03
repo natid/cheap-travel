@@ -78,6 +78,9 @@ def get_all_connections(origins, dests, func):
     while threading.activeCount() > 1:
         time.sleep(10)
 
+    #TODO - return the list of connections
+    return None
+
 def _create_str_date(date):
     return date.strftime("%Y-%m-%d")
 
@@ -87,7 +90,5 @@ def get_departure_flight_date(trip_response):
 def get_return_flight_date(trip_response):
     return trip_response['Flights'][-1]['Departure'][0:10]
 
-
-# def print_flight(origin, connection, dest, depart_date, arrive_date, price, flight_type):
-#     print "{0} -> {1} from {2} to {3}".format(origin, connection, depart_date, arrive_date)
-#     print "{0} -> {1} from {2} to {3}".format(connection, dest, depart_date, arrive_date)
+def _extract_cheapest_price(resp):
+    return resp['Journeys'][0][0]['Price']['Total']['Amount']

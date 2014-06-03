@@ -1,5 +1,5 @@
 import threading
-from vayant import get_price_round_trip, get_price_one_way
+from bl import get_price_round_trip, get_price_one_way
 from datetime import date, timedelta
 from threading import Thread
 import time

@@ -1,6 +1,6 @@
 __author__ = 'magenn'
 
-from vayant import get_price_round_trip, get_price_one_way
+from bl import get_price_round_trip, get_price_one_way
 import utils
 from datetime import date, timedelta
 
