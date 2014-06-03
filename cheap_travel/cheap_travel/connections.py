@@ -1,7 +1,5 @@
 import threading
-from bl import get_price_round_trip, get_price_one_way
 from datetime import date, timedelta
-from threading import Thread
 import time
 import utils
 import flight_checks
@@ -61,16 +59,10 @@ if __name__ == "__main__":
             progress+=1
             t = threading.Thread(target=check_for_origins,  args=(origin_list, dest, single_connection, depart_date, return_date))
             t.start()
+            threads.append(t)
 
-    while threading.activeCount() > 1:
-        time.sleep(10)
-
-    #         t = Thread(target=check_for_origins, args=(origin_list, dest, connection))
-    #         t.start()
-    #         threads.append(t)
-    #
-    # for t in threads:
-    #     t.join()
+    for t in threads:
+        t.join()
 
     for cities,price in final_prices.iteritems():
         if "Round Trip" not in cities:

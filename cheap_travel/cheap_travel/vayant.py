@@ -110,11 +110,14 @@ def call_vayant(trip):
 
 
 if __name__ == "__main__":
-    origins = ["LON", "AMS", "BER", "ROM", "PAR"]
-    dests = ["BKK", "MNL", "HKG"]
+    #origins = ["LON", "AMS", "BER", "ROM", "PAR"]
 
+    #dests = ["BKK", "MNL", "HKG"]
+
+    origins = ["LON"]
+    dests = ["BKK"]
     start = time.time()
-    connection = utils.get_all_connections(origins, dests, bl.get_connections)
+    connection = bl.get_all_connections(origins,dests)
     print connection
 
 
