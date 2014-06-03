@@ -49,12 +49,16 @@ if __name__ == "__main__":
     depart_date = date(2014, 11, 02)
     return_date = depart_date + timedelta(days=21)
 
-
+    progress=0
+    total_options = len(dest_list) * len(origin_list) * len(connections_list)
     for dest in dest_list:
         for single_connection in connections_list:
 
             while threading.activeCount() > 20:
                 time.sleep(5)
+            if((progress*100/total_options) != (((progress+1)*100)/total_options)):
+                print "{} percent done".format(progress*100/total_options)
+            progress+=1
             t = threading.Thread(target=check_for_origins,  args=(origin_list, dest, single_connection, depart_date, return_date))
             t.start()
 

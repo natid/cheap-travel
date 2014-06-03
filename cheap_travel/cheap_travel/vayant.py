@@ -16,6 +16,7 @@ import utils
 from StringIO import StringIO
 import gzip
 import zlib
+import sys
 
 connection=set()
 trips_cache=defaultdict()
@@ -112,6 +113,8 @@ def call_vayant(trip):
         return None
 
     trips_cache[key] = resp
+
+    print sys.getsizeof(json.dumps(resp))
 
     return resp
 
