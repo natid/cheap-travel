@@ -66,20 +66,22 @@ def read_airport_codes_from_csv():
 
 def get_all_connections(origins, dests, func):
 
+    connections=set()
+
     for origin in origins:
          for dest in dests:
             if dest != origin:
                 #single_check(origin, dest)
                 while threading.activeCount() > 1:
                     time.sleep(5)
-                t = threading.Thread(target=func, args=(str(origin).upper(), str(dest).upper()))
+                t = threading.Thread(target=func, args=(str(origin).upper(), str(dest).upper(), connections))
                 t.start()
 
     while threading.activeCount() > 1:
         time.sleep(10)
 
     #TODO - return the list of connections
-    return None
+    return connections
 
 def _create_str_date(date):
     return date.strftime("%Y-%m-%d")
