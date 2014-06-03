@@ -64,13 +64,13 @@ def read_airport_codes_from_csv():
 
     return origins
 
-def get_connections(origins, dests, func):
+def get_all_connections(origins, dests, func):
 
     for origin in origins:
          for dest in dests:
             if dest != origin:
                 #single_check(origin, dest)
-                while threading.activeCount() > 20:
+                while threading.activeCount() > 1:
                     time.sleep(5)
                 t = threading.Thread(target=func, args=(str(origin).upper(), str(dest).upper()))
                 t.start()
@@ -80,6 +80,13 @@ def get_connections(origins, dests, func):
 
 def _create_str_date(date):
     return date.strftime("%Y-%m-%d")
+
+def get_departure_flight_date(trip_response):
+    return trip_response['Journeys'][0][0]['Flights'][0]['Departure'][0:10]
+
+def get_return_flight_date(trip_response):
+    return trip_response['Journeys'][0][0]['Flights'][-1]['Departure'][0:10]
+
 
 # def print_flight(origin, connection, dest, depart_date, arrive_date, price, flight_type):
 #     print "{0} -> {1} from {2} to {3}".format(origin, connection, depart_date, arrive_date)

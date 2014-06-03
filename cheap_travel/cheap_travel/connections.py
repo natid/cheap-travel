@@ -6,11 +6,11 @@ import time
 import utils
 import flight_checks
 
+final_prices = {}
 
 def check_flights(origin, dest, connection, depart_date, return_date):
     global final_prices
     prices = []
-
     test_list = (flight_checks.check_round_trip,
                  flight_checks.check_two_one_ways,
                  flight_checks.check_connection_in_the_beginning,
@@ -35,14 +35,13 @@ def check_flights(origin, dest, connection, depart_date, return_date):
 
 def check_for_origins(origin_list, dest, connection, depart_date, return_date):
     for origin in origin_list:
-        if origin != dest != connection:
+        if origin != dest != connection != origin:
             check_flights(origin, dest, connection, depart_date, return_date)
 
 if __name__ == "__main__":
     threads = []
 
     connections_list = [u'CPH', u'CTU', u'DOH', u'CMB', u'IST', u'CAI', u'KUL', u'DEL', u'CAN', u'MUC', u'PEK', u'FRA', u'SIN', u'BAH', u'AMM', u'KWI', u'BKK', u'MNL', u'PVG', u'SGN', u'AMS', u'HKG', u'BWN', u'SVO', u'TPE', u'ICN', u'HAN', u'AUH', u'ADD', u'LHR', u'HEL', u'ZRH', u'RUH', u'CDG', u'VIE', u'MAN', u'XMN', u'MAA', u'MCT', u'DXB', u'ARN', u'BOM']
-    final_prices = {}
 
     origin_list = ['LON', 'BER', 'AMS', 'ROM', 'PAR', 'ZRH']
     dest_list = ['MNL', 'BKK', 'HKG', 'BJS']
@@ -52,11 +51,11 @@ if __name__ == "__main__":
 
 
     for dest in dest_list:
-        for connection in connections_list:
+        for single_connection in connections_list:
 
             while threading.activeCount() > 20:
                 time.sleep(5)
-            t = threading.Thread(target=check_for_origins,  args=(origin_list, dest, connection, depart_date, return_date))
+            t = threading.Thread(target=check_for_origins,  args=(origin_list, dest, single_connection, depart_date, return_date))
             t.start()
 
     while threading.activeCount() > 1:

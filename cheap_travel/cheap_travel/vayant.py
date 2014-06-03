@@ -17,8 +17,8 @@ from StringIO import StringIO
 import gzip
 import zlib
 
-
 connection=set()
+trips_cache=defaultdict()
 
 demo_request_json = {
     "SearchRequest":
@@ -45,17 +45,45 @@ demo_request_json = {
 }
 
 
-def build_trip(origin, dest, date, trip_id=1):
+def build_trip(origin, dest, dates, trip_id=1):
     trip = defaultdict(list)
     trip["Id"] = trip_id
     trip["SegmentPassengers"] = {"PassengerGroups": [{"Members": [{"Id": 1, "TypeId": 1, "Cabin": "Any"}]}]}
-    trip["Origin"].append(origin)
-    trip["Destination"].append(dest)
-    trip["DepartureDates"].append({"Date": date})
+    trip["Origin"].append(str(origin))
+    trip["Destination"].append(str(dest))
+
+    if type(dates) is str:
+        trip["DepartureDates"].append({"Date": dates})
+    elif type(dates) is list:
+        for date in dates:
+            trip["DepartureDates"].append({"Date": date})
+    else:
+        assert False, "wrong dates type"
+
     return trip
 
+def create_cache_key_from_trip(trip):
+    key=""
+    for single_trip in trip:
+        key += single_trip["Origin"][0] +"-"
+        key += single_trip["Destination"][0] +"-"
+        for date in single_trip["DepartureDates"]:
+            key += date["Date"] + "-"
+        key+=":"
+    print key
+    return key
 
 def call_vayant(trip):
+    key = create_cache_key_from_trip(trip)
+
+    trips_cache[key]=None
+
+    if key in trips_cache:
+        while key in trips_cache and not trips_cache[key]:
+            time.sleep(5)
+        if key in trips_cache:
+            return trips_cache[key]
+
     request_json = demo_request_json.copy()
     request_json["SearchRequest"]["TripSegments"] = trip
 
@@ -66,15 +94,15 @@ def call_vayant(trip):
     response = urllib2.urlopen(req)
 
 
-    d = zlib.decompressobj(16+zlib.MAX_WBITS)
+    decompressor = zlib.decompressobj(16+zlib.MAX_WBITS)
 
     json_resp = ""
 
     while True:
-        data = response.read(10000)
+        data = response.read(8192)
         if not data: break
         if response.info().get('Content-Encoding') == 'gzip':
-            data = d.decompress(data)
+            data = decompressor.decompress(data)
         json_resp += data
 
     resp = json.loads(json_resp)
@@ -82,16 +110,20 @@ def call_vayant(trip):
     if resp.has_key('Response') and resp['Response'] == 'Error':
         print "ERROR!!!"+ resp['Message']
         print trip
+        trips_cache.remove(key)
         return None
+
+    trips_cache[key] = trip
+
     return resp
 
 
 def _extract_cheapest_price(resp):
     return resp['Journeys'][0][0]['Price']['Total']['Amount']
 
-def get_price_round_trip(origin, dest, depart_date, arrive_date):
-    first_trip = build_trip(origin, dest, depart_date, 1)
-    second_trip = build_trip(dest, origin, arrive_date, 2)
+def get_price_round_trip(origin, dest, depart_dates, arrive_dates):
+    first_trip = build_trip(origin, dest, depart_dates, 1)
+    second_trip = build_trip(dest, origin, arrive_dates, 2)
     trip_data = call_vayant([first_trip, second_trip])
 
     if not trip_data:
@@ -100,8 +132,8 @@ def get_price_round_trip(origin, dest, depart_date, arrive_date):
 
     return _extract_cheapest_price(trip_data), trip_data['Journeys'][0][0]
 
-def get_price_one_way(origin, dest, depart_date):
-    first_trip = build_trip(origin, dest, depart_date, 1)
+def get_price_one_way(origin, dest, depart_dates):
+    first_trip = build_trip(origin, dest, depart_dates, 1)
     trip_data = call_vayant([first_trip])
 
     if not trip_data:
@@ -109,37 +141,14 @@ def get_price_one_way(origin, dest, depart_date):
 
     return _extract_cheapest_price(trip_data), trip_data['Journeys'][0][0]
 
-def single_check(origin, dest):
+def get_connections(origin, dest):
     global connection
     single_trip = build_trip(origin, dest, "2014-12-18")
-
-    second_trip = build_trip(dest, origin, "2014-12-25")
 
     go_trip_data = call_vayant([single_trip])
     if not go_trip_data:
         return
-    go_price = utils.get_price(go_trip_data)
-
-    return_trip_data = call_vayant([second_trip])
-    if not return_trip_data:
-        return
-    ret_price = utils.get_price(return_trip_data)
-
-    second_trip = build_trip(dest, origin, "2014-12-25", 2)
-    two_way_trip_data = call_vayant([single_trip, second_trip])
-    if not two_way_trip_data:
-        return
-    two_way_price = utils.get_price(two_way_trip_data)
-
-    if go_price + ret_price  < two_way_price:
-        print origin + "->" + dest + "->" + origin + ":"
-        utils.print_trip(go_trip_data)
-        utils.print_trip(return_trip_data)
-        utils.print_trip(two_way_trip_data)
-
     connection = connection.union(utils.get_connections_list(go_trip_data))
-
-   # print "END"
 
 
 if __name__ == "__main__":
@@ -147,7 +156,7 @@ if __name__ == "__main__":
     dests = ["BKK", "MNL", "HKG"]
 
     start = time.time()
-    utils.get_connections(origins,dests, single_check)
+    utils.get_all_connections(origins,dests, get_connections)
     print connection
     print time.time() - start
 
