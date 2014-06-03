@@ -82,10 +82,10 @@ def _create_str_date(date):
     return date.strftime("%Y-%m-%d")
 
 def get_departure_flight_date(trip_response):
-    return trip_response['Journeys'][0][0]['Flights'][0]['Departure'][0:10]
+    return trip_response['Flights'][0]['Departure'][0:10]
 
 def get_return_flight_date(trip_response):
-    return trip_response['Journeys'][0][0]['Flights'][-1]['Departure'][0:10]
+    return trip_response['Flights'][-1]['Departure'][0:10]
 
 
 # def print_flight(origin, connection, dest, depart_date, arrive_date, price, flight_type):

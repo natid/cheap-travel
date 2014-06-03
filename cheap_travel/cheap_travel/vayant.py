@@ -70,7 +70,6 @@ def create_cache_key_from_trip(trip):
         for date in single_trip["DepartureDates"]:
             key += date["Date"] + "-"
         key+=":"
-    print key
     return key
 
 def call_vayant(trip):
