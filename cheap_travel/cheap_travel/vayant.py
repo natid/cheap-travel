@@ -76,13 +76,12 @@ def create_cache_key_from_trip(trip):
 def call_vayant(trip):
     key = create_cache_key_from_trip(trip)
 
-    trips_cache[key]=None
-
+    while key in trips_cache and not trips_cache[key]:
+        time.sleep(5)
     if key in trips_cache:
-        while key in trips_cache and not trips_cache[key]:
-            time.sleep(5)
-        if key in trips_cache:
-            return trips_cache[key]
+        return trips_cache[key]
+
+    trips_cache[key]=None
 
     request_json = demo_request_json.copy()
     request_json["SearchRequest"]["TripSegments"] = trip
@@ -113,7 +112,7 @@ def call_vayant(trip):
         trips_cache.remove(key)
         return None
 
-    trips_cache[key] = trip
+    trips_cache[key] = resp
 
     return resp
 
