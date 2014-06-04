@@ -5,6 +5,7 @@ from collections import defaultdict
 import time
 import zlib
 import pricer
+import sys
 from cheap_travel.db.flights_resp import FlightsRespDAL
 
 trips_cache = defaultdict()
@@ -43,15 +44,21 @@ class VayantConnector(object):
     def call_vayant(self, trip):
         key = self._create_cache_key_from_trip(trip)
 
+        a = time.time()
         cached_resp = self.flights_resp_dal.get(key)
+        print "Query time is {} size is {}".format(time.time() - a, sys.getsizeof(cached_resp))
         while self.flights_resp_dal.has_key(key) and cached_resp is None:
+            print "None None None"
             time.sleep(5)
             cached_resp = self.flights_resp_dal.get(key)
         if cached_resp:
-            print "getting from cache"
             return cached_resp
 
-        print "calling vayant"
+        else:
+            return None
+
+
+        print "calling vayant not cache!!!"
         self.flights_resp_dal.set(key, None)
 
         request_json = demo_request_json.copy()
@@ -66,9 +73,9 @@ class VayantConnector(object):
         resp = self._decompress_and_extract_json(response)
 
         if resp.has_key('Response') and resp['Response'] == 'Error':
-            print "ERROR!!!"+ resp['Message']
-            print trip
-            trips_cache.remove(key)
+            print "ERROR!!! "+ resp['Message']
+            print json.dumps(trip)
+            self.flights_resp_dal.remove(key)
             return None
 
         self.flights_resp_dal.set(key, resp)

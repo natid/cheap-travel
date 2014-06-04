@@ -6,6 +6,7 @@ class FlightsRespDAL(object):
         client = MongoClient('localhost', 27017)
         db = client.flights_db
         self.flights_collection = db.flights_collection
+        self.flights_collection.create_index("key")
 
     def set(self, key, data):
         self.remove(key)

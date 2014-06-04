@@ -2,13 +2,13 @@ import threading
 from datetime import date, timedelta
 import time
 from cheap_travel.flight_checks import FlightChecker
+from cheap_travel.utils import ThreadPool
 import utils
 import flight_checks
 
 final_prices = {}
 
-def check_flights(origin, dest, connection, depart_date, return_date):
-    flight_checker = FlightChecker()
+def check_flights(origin, dest, connection, depart_date, return_date, flight_checker):
     global final_prices
     prices = []
     test_list = (flight_checker.check_round_trip,
@@ -18,10 +18,16 @@ def check_flights(origin, dest, connection, depart_date, return_date):
                  flight_checker.check_two_connections_stay_in_the_beginning,
                  flight_checker.check_two_connections_stay_in_the_end)
 
+
+    i=1
     for test in test_list:
+        a = time.time()
         data = test(origin, dest, depart_date, return_date, connection)
+        #print "WOW ", time.time() - a, i
         if data:
             prices.append(data)
+        i+=1
+
 
     if prices:
         min_price = min(prices, key=lambda x: x[1])
@@ -49,12 +55,19 @@ if __name__ == "__main__":
     depart_date = date(2014, 11, 02)
     return_date = depart_date + timedelta(days=21)
 
-    progress=0
+    progress = 0
     total_options = len(dest_list) * len(connections_list)
+    pool = ThreadPool(1, "flight_checker", FlightChecker)
+
     for dest in dest_list:
         for single_connection in connections_list:
+            for origin in origin_list:
+                if origin != dest != single_connection != origin:
 
-            while threading.activeCount() > 20:
+                    pool.add_task(check_flights, origin_list, dest, single_connection, depart_date, return_date)
+
+    """
+            while threading.activeCount() > 80:
                 time.sleep(5)
             if((progress*100/total_options) != (((progress+1)*100)/total_options)):
                 print "{} percent done".format(progress*100/total_options)
@@ -65,8 +78,15 @@ if __name__ == "__main__":
 
     for t in threads:
         t.join()
+    """
 
-    for cities,price in final_prices.iteritems():
+
+    print "Number of tasks", pool.task_number
+    pool.start()
+    print "Waiting for completion"
+    pool.wait_completion()
+
+    for cities, price in final_prices.iteritems():
         if "Round Trip" not in cities:
             print "{}, {}, price = {}, flights information is: \n".format(cities, price[0], price[1])
             for flight in price[2]:
