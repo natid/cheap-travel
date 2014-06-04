@@ -1,8 +1,8 @@
 import threading
 from datetime import date, timedelta
 import time
-from cheap_travel.flight_checks import FlightChecker
-from cheap_travel.utils import ThreadPool
+from flight_checks import FlightChecker
+from utils import ThreadPool
 import utils
 import flight_checks
 
@@ -57,14 +57,14 @@ if __name__ == "__main__":
 
     progress = 0
     total_options = len(dest_list) * len(connections_list)
-    pool = ThreadPool(1, "flight_checker", FlightChecker)
+    pool = ThreadPool(20, "flight_checker", FlightChecker)
 
     for dest in dest_list:
         for single_connection in connections_list:
             for origin in origin_list:
                 if origin != dest != single_connection != origin:
 
-                    pool.add_task(check_flights, origin_list, dest, single_connection, depart_date, return_date)
+                    pool.add_task(check_flights, origin, dest, single_connection, depart_date, return_date)
 
     """
             while threading.activeCount() > 80:

@@ -66,7 +66,7 @@ def get_departure_flight_date(trip_response):
 def get_return_flight_date(trip_response):
     return trip_response['Flights'][-1]['Departure'][0:10]
 
-def _extract_cheapest_price(resp):
+def extract_cheapest_price(resp):
     sorted_response = sorted(resp['Journeys'], key=lambda trip: trip[0]['Price']['Total']['Amount'])
     try:
         return sorted_response[0][0]['Price']['Total']['Amount']
