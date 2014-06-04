@@ -5,7 +5,7 @@ import threading
 import time
 from collections import defaultdict
 
-from cheap_travel import utils
+import utils
 from vayant import VayantConnector
 
 

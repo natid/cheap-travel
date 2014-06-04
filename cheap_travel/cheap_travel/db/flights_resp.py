@@ -17,14 +17,14 @@ class FlightsRespDAL(object):
         self.flights_collection.insert(new_dict)
 
     def get(self, key):
-        data = self.flights_collection.find_one({"key": key})
+        data = self.flights_collection.find_one({"key": key}, fields= { 'value.Journeys' : { "$slice": 1 }})
         if data:
             return data['value']
         else:
             return
 
     def has_key(self, key):
-        return self.flights_collection.find_one({"key": key}) is not None
+        return self.flights_collection.find_one({"key": key}, fields= { 'value.Journeys' : { "$slice": 1 }}) is not None
 
     def remove(self, key):
         self.flights_collection.remove({"key": key})

@@ -1,4 +1,4 @@
-from cheap_travel.flights_data.pricer import Pricer
+from flights_data.pricer import Pricer
 import utils
 from datetime import date, timedelta
 

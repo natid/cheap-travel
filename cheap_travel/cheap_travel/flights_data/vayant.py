@@ -44,18 +44,15 @@ class VayantConnector(object):
     def call_vayant(self, trip):
         key = self._create_cache_key_from_trip(trip)
 
-        a = time.time()
+        #a = time.time()
         cached_resp = self.flights_resp_dal.get(key)
-        print "Query time is {} size is {}".format(time.time() - a, sys.getsizeof(cached_resp))
+        #print "Query time is {} size is {}".format(time.time() - a, sys.getsizeof(cached_resp))
         while self.flights_resp_dal.has_key(key) and cached_resp is None:
-            print "None None None"
+            print "None None None -- Waiting for other thread"
             time.sleep(5)
             cached_resp = self.flights_resp_dal.get(key)
         if cached_resp:
             return cached_resp
-
-        else:
-            return None
 
 
         print "calling vayant not cache!!!"
