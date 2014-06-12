@@ -1,4 +1,4 @@
-from cheap_travel.db.flights_resp import FlightsRespDAL
+from flights_resp import FlightsRespDAL
 
 if __name__ == "__main__":
 
