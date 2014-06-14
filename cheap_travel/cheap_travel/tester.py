@@ -93,7 +93,6 @@ if __name__ == "__main__":
                 if origin != dest != single_connection != origin:
                     pool.add_task(check_flights, origin, dest, single_connection, depart_date, return_date,
                                   final_prices)
-
     print "Number of tasks", pool.task_number
     pool.start()
     print "Waiting for completion"
