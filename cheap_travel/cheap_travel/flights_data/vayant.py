@@ -4,7 +4,9 @@ import hashlib
 from collections import defaultdict
 import time
 import zlib
+
 from cheap_travel.db.flights_resp import FlightsRespDAL
+
 
 trips_cache = defaultdict()
 
@@ -41,30 +43,24 @@ class VayantConnector(object):
 
     def get_flights_info(self, trip):
         key = self._create_cache_key_from_trip(trip)
-
         #a = time.time()
         cached_resp = self.flights_resp_dal.get(key)
         #print "Query time is {} size is {}".format(time.time() - a, sys.getsizeof(cached_resp))
         while self.flights_resp_dal.has_key(key) and cached_resp is None:
-            print "None None None -- Waiting for other thread"
             time.sleep(5)
             cached_resp = self.flights_resp_dal.get(key)
         if cached_resp:
             return cached_resp
 
 
-        print "calling vayant not cache!!!"
         self.flights_resp_dal.set(key, None)
 
         request_json = demo_request_json.copy()
         request_json["SearchRequest"]["TripSegments"] = trip
 
         header = {"Content-Type": "application/JSON ", "Accept-encoding": "gzip"}
-
         req = urllib2.Request("http://fs-json.demo.vayant.com:7080/", data=json.dumps(request_json), headers=header)
-
         response = urllib2.urlopen(req)
-
         resp = self._decompress_and_extract_json(response)
 
         if resp.has_key('Response') and resp['Response'] == 'Error':
@@ -137,16 +133,16 @@ class VayantConnector(object):
             else:
                 print "\t carrier: " + leg["OperatingCarrier"]
 
-    def get_first_flight_from_trip(selfself, trip_data):
+    def get_first_flight_from_trip(self, trip_data):
         return trip_data['Journeys'][0][0]
 
-    def get_departure_flight_date(trip_response):
+    def get_departure_flight_date(self, trip_response):
         return trip_response['Flights'][0]['Departure'][0:10]
 
-    def get_return_flight_date(trip_response):
+    def get_return_flight_date(self, trip_response):
         return trip_response['Flights'][-1]['Departure'][0:10]
 
-    def extract_cheapest_price(resp):
+    def extract_cheapest_price(self, resp):
         sorted_response = sorted(resp['Journeys'], key=lambda trip: trip[0]['Price']['Total']['Amount'])
         try:
             return sorted_response[0][0]['Price']['Total']['Amount']
@@ -154,7 +150,7 @@ class VayantConnector(object):
             print "ERROR getting the price" , resp, sorted_response
             return 0
 
-    def get_connections_list(trip):
+    def get_connections_list(self, trip):
         connections=set()
         for single in trip['Journeys']:
             if len(single[0]["Flights"]) == 2 :
