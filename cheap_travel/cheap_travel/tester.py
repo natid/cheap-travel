@@ -84,7 +84,7 @@ if __name__ == "__main__":
     depart_date = date(2014, 11, 02)
     return_date = depart_date + timedelta(days=21)
 
-    pool = ThreadPool(1, "flight_checker", FlightChecker)
+    pool = ThreadPool(20, "flight_checker", FlightChecker)
 
     for dest in dest_list:
         for single_connection in connections_list:

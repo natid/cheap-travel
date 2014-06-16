@@ -4,7 +4,7 @@ from pricer import Pricer
 
 from dateutil import parser
 import constants
-import pprint
+from pprint import pprint
 
 class FlightChecker(object):
     def __init__(self):
@@ -118,17 +118,37 @@ class FlightChecker(object):
         return date.strftime("%Y-%m-%d")
 
     def get_cheapest_flights_that_can_connect(self, is_one_way_flights, trip1, trip2):
-
+        provider = self.pricer.flights_provider
         # return self.pricer.flights_provider.extract_cheapest_price(trip1), trip1['Journeys'][0][0], \
         #        self.pricer.flights_provider.extract_cheapest_price(trip2), trip2['Journeys'][0][0]
 
         cookie = []
         first_flight, second_flight = self.get_next_flights(trip1, trip2, is_one_way_flights, cookie)
         while first_flight and second_flight:
-            if self.flights_can_connect(first_flight["Flights"][-1], second_flight["Flights"][0]):
-                return self.pricer.flights_provider.get_price(first_flight), first_flight, \
-                       self.pricer.flights_provider.get_price(second_flight), second_flight
+            if is_one_way_flights:
+                if self.flights_can_connect(first_flight["Flights"][-1], second_flight["Flights"][0]):
+
+                    return provider.get_price(first_flight), first_flight, \
+                           provider.get_price(second_flight), second_flight
+            else:
+                connection_arrival, connection_departure = provider.get_dest_flights_in_two_way(first_flight)
+                if self.flights_can_connect(connection_arrival, second_flight["Flights"][0]) and \
+                   self.flights_can_connect(second_flight["Flights"][-1], connection_departure):
+
+                    return provider.get_price(first_flight), first_flight, \
+                           provider.get_price(second_flight), second_flight
+                else:
+                    print connection_arrival
+                    print second_flight["Flights"][0]
+                    print second_flight["Flights"][-1]
+                    print connection_departure
+                    print trip2
+                    print trip2
+
+
             first_flight, second_flight = self.get_next_flights(trip1, trip2, is_one_way_flights, cookie)
+
+
 
         return None, None, None ,None
 
@@ -186,13 +206,13 @@ class FlightChecker(object):
             return (None, None)
 
     def flights_can_connect(self, flight1, flight2):
+        if not flight1 or not flight2:
+            return False
+
         #first check that it's the same airport
         #TODO - see how we handle airport changes in the connections
         if (flight1["Destination"] != flight2["Origin"]):
             print "wrong airports {} != {}".format(flight1["Destination"], flight2["Origin"])
-            pprint.pprint(flight1)
-            pprint.pprint(flight2)
-            exit
             return False
 
         #then check that there's a 5 hour connection time (#TODO - why 5?)

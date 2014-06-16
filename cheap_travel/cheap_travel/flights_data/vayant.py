@@ -164,3 +164,13 @@ class VayantConnector(object):
     def get_price(self, flight):
         return flight['Price']['Total']['Amount']
 
+    def get_dest_flights_in_two_way(self, trip):
+        index = 0
+
+        while index != len(trip['Flights']) -1 and trip['Flights'][index]["Destination"] != trip['Flights'][index+1]["Origin"]:
+            index += 1
+
+        if index == len(trip['Flights']) -1:
+            return None
+
+        return trip['Flights'][index], trip['Flights'][index+1]

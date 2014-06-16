@@ -78,7 +78,13 @@ class FlightsRespDAL(object):
         self.flights_collection.remove({"key": key})
 
     def get_airport(self, code):
-        return self.airport_collection.find_one({"airport_code": code})['airport_name']
+        value = self.airport_collection.find_one({"airport_code": code})
+        if value:
+            return value['airport_name']
+        return None
 
     def get_airline(self, code):
-        return self.airline_collection.find_one({"airline_code": code})['airline_name']
+        value = self.airline_collection.find_one({"airline_code": code})
+        if value:
+            return ['airline_name']
+        return None
