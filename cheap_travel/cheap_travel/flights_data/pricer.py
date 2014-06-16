@@ -16,16 +16,14 @@ class Pricer(object):
         if not trip_data:
             return (None, None)
 
-        trip_to_return = trip_data if get_full_response else self.flights_provider.get_first_flight_from_trip(trip_data)
-        return self.flights_provider.extract_cheapest_price(trip_data), trip_to_return
+        return self.flights_provider.extract_cheapest_price(trip_data), trip_data
 
-    def get_price_one_way(self, origin, dest, depart_dates, get_full_response = False):
+    def get_price_one_way(self, origin, dest, depart_dates):
         first_trip = self.flights_provider.build_trip(origin, dest, depart_dates, 1)
         trip_data = self.flights_provider.get_flights_info([first_trip])
 
         if not trip_data:
             return (None, None)
 
-        trip_to_return = trip_data if get_full_response else self.flights_provider.get_first_flight_from_trip(trip_data)
-        return self.flights_provider.extract_cheapest_price(trip_data), trip_to_return
+        return self.flights_provider.extract_cheapest_price(trip_data), trip_data
 

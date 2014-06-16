@@ -144,11 +144,11 @@ class VayantConnector(object):
 
     def extract_cheapest_price(self, resp):
         sorted_response = sorted(resp['Journeys'], key=lambda trip: trip[0]['Price']['Total']['Amount'])
-        try:
-            return sorted_response[0][0]['Price']['Total']['Amount']
-        except:
-            print "ERROR getting the price" , resp, sorted_response
-            return 0
+        #try:
+        return sorted_response[0][0]['Price']['Total']['Amount']
+        # except:
+        #     print "ERROR getting the price" , resp, sorted_response
+        #     return 0
 
     def get_connections_list(self, trip):
         connections=set()
@@ -158,4 +158,9 @@ class VayantConnector(object):
                     connections.add(single[0]["Flights"][0]["Destination"])
         return connections
 
+    def get_flight(self, trip, index):
+        return trip['Journeys'][index][0]
+
+    def get_price(self, flight):
+        return flight['Price']['Total']['Amount']
 

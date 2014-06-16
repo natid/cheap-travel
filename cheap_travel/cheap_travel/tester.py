@@ -10,7 +10,7 @@ from flights_data.pricer import Pricer
 def get_connections(origin, dest, queue):
     pricer = Pricer("Vayant")
 
-    go_trip_data = pricer.get_price_one_way(origin, dest, "2014-12-18", True)[1]
+    go_trip_data = pricer.get_price_one_way(origin, dest, "2014-12-18")[1]
     queue.put(pricer.flights_provider.get_connections_list(go_trip_data))
 
 
@@ -46,7 +46,6 @@ def get_all_connections(origins, dests):
 
 
 def check_flights(origin, dest, connection, depart_date, return_date, results_dict, flight_checker):
-    global final_prices
     prices = []
     test_list = (flight_checker.check_round_trip,
                  flight_checker.check_two_one_ways,
@@ -85,7 +84,7 @@ if __name__ == "__main__":
     depart_date = date(2014, 11, 02)
     return_date = depart_date + timedelta(days=21)
 
-    pool = ThreadPool(20, "flight_checker", FlightChecker)
+    pool = ThreadPool(1, "flight_checker", FlightChecker)
 
     for dest in dest_list:
         for single_connection in connections_list:

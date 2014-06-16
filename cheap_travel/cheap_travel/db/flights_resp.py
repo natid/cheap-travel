@@ -1,5 +1,6 @@
 from pymongo import MongoClient
 import csv
+import constants
 
 
 class FlightsRespDAL(object):
@@ -64,7 +65,7 @@ class FlightsRespDAL(object):
         self.flights_collection.insert(new_dict)
 
     def get(self, key):
-        data = self.flights_collection.find_one({"key": key}, fields= { 'value.Journeys' : { "$slice": 1 }})
+        data = self.flights_collection.find_one({"key": key}, fields= { 'value.Journeys' : { "$slice": constants.MAX_FLIGHTS_PER_TRIP }})
         if data:
             return data['value']
         else:
