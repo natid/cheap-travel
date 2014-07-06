@@ -45,31 +45,35 @@ class VayantConnector(object):
         key = self._create_cache_key_from_trip(trip)
         #a = time.time()
         cached_resp = self.flights_resp_dal.get(key)
-        #print "Query time is {} size is {}".format(time.time() - a, sys.getsizeof(cached_resp))
-        while self.flights_resp_dal.has_key(key) and cached_resp is None:
+        #print "Query time is {} size is {}".format(time.time() - a, sys.getsizeof
+        while self.flights_resp_dal.has_key(key) and cached_resp is None :
             time.sleep(5)
             cached_resp = self.flights_resp_dal.get(key)
         if cached_resp:
             return cached_resp
 
+        try:
+            self.flights_resp_dal.set(key, None)
 
-        self.flights_resp_dal.set(key, None)
+            request_json = demo_request_json.copy()
+            request_json["SearchRequest"]["TripSegments"] = trip
 
-        request_json = demo_request_json.copy()
-        request_json["SearchRequest"]["TripSegments"] = trip
+            header = {"Content-Type": "application/JSON ", "Accept-encoding": "gzip"}
+            req = urllib2.Request("http://fs-json.demo.vayant.com:7080/", data=json.dumps(request_json), headers=header)
+            response = urllib2.urlopen(req)
+            resp = self._decompress_and_extract_json(response)
 
-        header = {"Content-Type": "application/JSON ", "Accept-encoding": "gzip"}
-        req = urllib2.Request("http://fs-json.demo.vayant.com:7080/", data=json.dumps(request_json), headers=header)
-        response = urllib2.urlopen(req)
-        resp = self._decompress_and_extract_json(response)
+            if resp.has_key('Response') and resp['Response'] == 'Error':
+                print "ERROR!!! "+ resp['Message']
+                print json.dumps(trip)
+                self.flights_resp_dal.remove(key)
+                return None
 
-        if resp.has_key('Response') and resp['Response'] == 'Error':
-            print "ERROR!!! "+ resp['Message']
-            print json.dumps(trip)
-            self.flights_resp_dal.remove(key)
-            return None
+            self.flights_resp_dal.set(key, resp)
+        finally:
+            if not resp:
+                self.flights_resp_dal.remove(key)
 
-        self.flights_resp_dal.set(key, resp)
 
         return resp
 
@@ -144,11 +148,11 @@ class VayantConnector(object):
 
     def extract_cheapest_price(self, resp):
         sorted_response = sorted(resp['Journeys'], key=lambda trip: trip[0]['Price']['Total']['Amount'])
-        #try:
-        return sorted_response[0][0]['Price']['Total']['Amount']
-        # except:
-        #     print "ERROR getting the price" , resp, sorted_response
-        #     return 0
+        try:
+            return sorted_response[0][0]['Price']['Total']['Amount']
+        except:
+            print "ERROR getting the price" , resp, sorted_response
+            return 0
 
     def get_connections_list(self, trip):
         connections=set()

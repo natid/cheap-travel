@@ -21,6 +21,10 @@ class FlightsRespDAL(object):
         self.insert_airlines_to_db()
         self.insert_airports_to_db()
 
+        #remove all keys without values
+        self.flights_collection.remove({"value": None})
+
+
     def insert_airlines_to_db(self):
         if self.get_airline("DL") is not None:
             return
@@ -86,5 +90,5 @@ class FlightsRespDAL(object):
     def get_airline(self, code):
         value = self.airline_collection.find_one({"airline_code": code})
         if value:
-            return ['airline_name']
+            return value['airline_name']
         return None

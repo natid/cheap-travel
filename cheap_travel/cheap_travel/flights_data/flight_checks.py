@@ -4,13 +4,13 @@ from pricer import Pricer
 
 from dateutil import parser
 import constants
-from pprint import pprint
+
 
 class FlightChecker(object):
     def __init__(self):
         self.pricer = Pricer("Vayant")
 
-    def check_round_trip(self, origin, dest, depart_date, return_date, connection):
+    def check_round_trip(self, origin, dest, depart_date, return_date, connection1, connection2):
         price1, trip_data1 = self.pricer.get_price_round_trip(origin, dest, self._create_str_date(depart_date),
                                                               self._create_str_date(return_date))
         if price1:
@@ -19,7 +19,7 @@ class FlightChecker(object):
         else:
             return None
 
-    def check_two_one_ways(self, origin, dest, depart_date, return_date, connection):
+    def check_two_one_ways(self, origin, dest, depart_date, return_date, connection1, connection2):
         price1, trip_data1 = self.pricer.get_price_one_way(origin, dest, self._create_str_date(depart_date))
         price2, trip_data2 = self.pricer.get_price_one_way(dest, origin, self._create_str_date(return_date))
 
@@ -30,84 +30,114 @@ class FlightChecker(object):
         else:
             return None
 
-    def check_connection_in_the_beginning(self, origin, dest, depart_date, return_date, connection):
+    def check_two_one_ways_from_different_connections(self, origin, dest, depart_date, return_date, connection1, connection2):
+
         depart_dates = []
-        for i in range(4):
+        for i in range(constants.CONNECTION_DAYS):
             depart_from_connection_date = depart_date + timedelta(days=i)
             depart_dates.append(self._create_str_date(depart_from_connection_date))
 
-        price1, trip_data1 = self.pricer.get_price_one_way(origin, connection, self._create_str_date(depart_date))
-        price2, trip_data2 = self.pricer.get_price_one_way(connection, dest, depart_dates)
+        price1, trip_data1 = self.pricer.get_price_one_way(origin, connection1, self._create_str_date(depart_date))
+        price2, trip_data2 = self.pricer.get_price_one_way(connection1, dest, depart_dates)
+
+
+        return_dates = []
+        for i in range(constants.CONNECTION_DAYS):
+            depart_from_dest_date = return_date - timedelta(days=i)
+            return_dates.append(self._create_str_date(depart_from_dest_date))
+
+        price3, trip_data3 = self.pricer.get_price_one_way(dest, connection2, return_dates)
+        price4, trip_data4 = self.pricer.get_price_one_way(connection2, origin, self._create_str_date(return_date))
+
+
+        if price1 and price2 and price3:
+            price3, trip_data3 = self.get_cheapest_flight_and_price(trip_data3)
+            price1, trip_data1, price2, trip_data2 = self.get_cheapest_flights_that_can_connect(True, trip_data1,
+                                                                                                trip_data2, connection1)
+            price3, trip_data3, price4, trip_data4 = self.get_cheapest_flights_that_can_connect(True, trip_data3,
+                                                                                                trip_data4, connection2)
+            if price1 and price2 and price3 and price4:
+                return ("4 one way flights in {} and {}".format(connection1,connection2),
+                        price1 + price2 + price3 +price4, [trip_data1, trip_data2, trip_data3, trip_data4] )
+        return None
+    def check_connection_in_the_beginning(self, origin, dest, depart_date, return_date, connection1, connection2):
+        depart_dates = []
+        for i in range(constants.CONNECTION_DAYS):
+            depart_from_connection_date = depart_date + timedelta(days=i)
+            depart_dates.append(self._create_str_date(depart_from_connection_date))
+
+        price1, trip_data1 = self.pricer.get_price_one_way(origin, connection1, self._create_str_date(depart_date))
+        price2, trip_data2 = self.pricer.get_price_one_way(connection1, dest, depart_dates)
         price3, trip_data3 = self.pricer.get_price_one_way(dest, origin, self._create_str_date(return_date))
 
         if price1 and price2 and price3:
             price3, trip_data3 = self.get_cheapest_flight_and_price(trip_data3)
             price1, trip_data1, price2, trip_data2 = self.get_cheapest_flights_that_can_connect(True, trip_data1,
-                                                                                                trip_data2, connection)
+                                                                                                trip_data2, connection1)
             if price1 and price2:
-                return ("Connection in beginning in {} at {}".format(connection,
+                return ("Connection in beginning in {} at {}".format(connection1,
                                                                      self.pricer.flights_provider.get_departure_flight_date(
                                                                          trip_data2)), price1 + price2 + price3,
                         [trip_data1, trip_data2, trip_data3] )
         return None
 
-    def check_connection_in_the_end(self, origin, dest, depart_date, return_date, connection):
+    def check_connection_in_the_end(self, origin, dest, depart_date, return_date, connection1, connection2):
         depart_dates = []
-        for i in range(4):
+        for i in range(constants.CONNECTION_DAYS):
             depart_from_dest_date = return_date - timedelta(days=i)
             depart_dates.append(self._create_str_date(depart_from_dest_date))
 
         price1, trip_data1 = self.pricer.get_price_one_way(origin, dest, self._create_str_date(depart_date))
-        price2, trip_data2 = self.pricer.get_price_one_way(dest, connection, depart_dates)
-        price3, trip_data3 = self.pricer.get_price_one_way(connection, origin, self._create_str_date(return_date))
+        price2, trip_data2 = self.pricer.get_price_one_way(dest, connection1, depart_dates)
+        price3, trip_data3 = self.pricer.get_price_one_way(connection1, origin, self._create_str_date(return_date))
 
         if price1 and price2 and price3:
             price1, trip_data1 = self.get_cheapest_flight_and_price(trip_data1)
             price2, trip_data2, price3, trip_data3 = self.get_cheapest_flights_that_can_connect(True, trip_data2,
-                                                                                                trip_data3, connection)
+                                                                                                trip_data3, connection1)
             if price2 and price3:
-                return ("Connection in the end in {} at {}".format(connection,
+                return ("Connection in the end in {} at {}".format(connection1,
                                                                    self.pricer.flights_provider.get_departure_flight_date(
                                                                        trip_data2)), price1 + price2 + price3,
                         [trip_data1, trip_data2, trip_data3] )
         return None
 
-    def check_two_connections_stay_in_the_beginning(self, origin, dest, depart_date, return_date, connection):
+    def check_two_connections_stay_in_the_beginning(self, origin, dest, depart_date, return_date, connection1, connection2):
         depart_dates = []
-        for i in range(4):
+        for i in range(constants.CONNECTION_DAYS):
             depart_from_connection_date = depart_date + timedelta(days=i)
             depart_dates.append(self._create_str_date(depart_from_connection_date))
 
-        price1, trip_data1 = self.pricer.get_price_round_trip(origin, connection, self._create_str_date(depart_date),
+        price1, trip_data1 = self.pricer.get_price_round_trip(origin, connection1, self._create_str_date(depart_date),
                                                               self._create_str_date(return_date))
-        price2, trip_data2 = self.pricer.get_price_round_trip(connection, dest, depart_dates,
+        price2, trip_data2 = self.pricer.get_price_round_trip(connection1, dest, depart_dates,
                                                               self._create_str_date(return_date))
         if price1 and price2:
             price1, trip_data1, price2, trip_data2 = self.get_cheapest_flights_that_can_connect(False, trip_data1,
-                                                                                                trip_data2, connection)
+                                                                                                trip_data2, connection1)
             if price1 and price2:
-                return ("Two Connections stay in the beginning in {} at {}".format(connection,
+                return ("Two Connections stay in the beginning in {} at {}".format(connection1,
                                                                                    self.pricer.flights_provider.get_departure_flight_date(
                                                                                        trip_data2)), price1 + price2,
                         [trip_data1, trip_data2]  )
 
         return None
 
-    def check_two_connections_stay_in_the_end(self, origin, dest, depart_date, return_date, connection):
-        depart_dates = []
-        for i in range(4):
+    def check_two_connections_stay_in_the_end(self, origin, dest, depart_date, return_date, connection1, connection2):
+        return_dates = []
+        for i in range(constants.CONNECTION_DAYS):
             depart_from_dest_date = return_date - timedelta(days=i)
-            depart_dates.append(self._create_str_date(depart_from_dest_date))
+            return_dates.append(self._create_str_date(depart_from_dest_date))
 
-        price1, trip_data1 = self.pricer.get_price_round_trip(origin, connection, self._create_str_date(depart_date),
-                                                              depart_dates)
-        price2, trip_data2 = self.pricer.get_price_round_trip(connection, dest, self._create_str_date(depart_date),
+        price1, trip_data1 = self.pricer.get_price_round_trip(origin, connection1, self._create_str_date(depart_date),
                                                               self._create_str_date(return_date))
+        price2, trip_data2 = self.pricer.get_price_round_trip(connection1, dest, self._create_str_date(depart_date),
+                                                              return_dates)
         if price1 and price2:
             price1, trip_data1, price2, trip_data2 = self.get_cheapest_flights_that_can_connect(False, trip_data1,
-                                                                                                trip_data2, connection)
+                                                                                                trip_data2, connection1)
             if price1 and price2:
-                return ("Two Connections stay in the end in {} at {}".format(connection,
+                return ("Two Connections stay in the end in {} at {}".format(connection1,
                                                                              self.pricer.flights_provider.get_return_flight_date(
                                                                                  trip_data1)), price1 + price2,
                         [trip_data1, trip_data2] )
@@ -137,13 +167,7 @@ class FlightChecker(object):
 
                     return provider.get_price(first_flight), first_flight, \
                            provider.get_price(second_flight), second_flight
-                else:
-                    print "nir - Start"
-                    print connection_arrival
-                    print second_flight["Flights"][0]
-                    print second_flight["Flights"][-1]
-                    print connection_departure
-                    print "nir - End"
+
 
             first_flight, second_flight = self.get_next_flights(trip1, trip2, is_one_way_flights, cookie)
 
@@ -211,7 +235,6 @@ class FlightChecker(object):
         #first check that it's the same airport
         #TODO - see how we handle airport changes in the connections
         if (flight1["Destination"] != flight2["Origin"]):
-            print "wrong airports {} != {}".format(flight1["Destination"], flight2["Origin"])
             return False
 
         #then check that there's a 5 hour connection time (#TODO - why 5?)
@@ -219,7 +242,10 @@ class FlightChecker(object):
         deparure_time = parser.parse(flight2["Departure"])
         delta = deparure_time - arrival_time
 
-        if (delta.total_seconds() / 60 / 60 < 5):
+        if (delta.total_seconds() / 60 / 60 < 0):
+            # print "There is not enough conction time between flights. only {} hours, is_one_way_flights={}".format(delta.total_seconds() / 60 / 60, is_one_way_flights)
+            # print "flight1 departure={} , flight1 arrival = {}".format(flight1["Departure"],flight1["Arrival"])
+            # print "flight2 departure={} , flight1 arrival = {}".format(flight2["Departure"],flight2["Arrival"])
             return False
 
         return True
