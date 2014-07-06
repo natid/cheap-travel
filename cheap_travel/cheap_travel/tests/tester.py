@@ -61,8 +61,8 @@ def check_flights(origin, dest, connection, depart_date, return_date, results_di
         min_price = min(prices, key=lambda x: x[1])
 
         if "Round Trip" not in min_price[0]:
-            dict_key = "%s-%s-%s-%s-%s" % (origin, dest, connection, depart_date, return_date)
-            flight_checker.pricer.flights_provider.flights_resp_dal.insert_result_to_db(dict_key, prices)
+            dict_key = "%s-%s, %s, %s" % (origin, dest, depart_date, return_date)
+            flight_checker.pricer.flights_provider.flights_resp_dal.insert_results_to_db(dict_key, prices)
 
         #TODO - we need to make this thread safe
         # if results_dict.has_key(dict_key):

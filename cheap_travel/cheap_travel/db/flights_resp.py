@@ -32,7 +32,7 @@ class FlightsRespDAL(object):
         if self.get_airline("DL") is not None:
             return
 
-        with open('airlines.csv', 'rb') as csvfile:
+        with open('db/airlines.csv', 'rb') as csvfile:
             reader = csv.reader(csvfile, delimiter=',', quotechar='|')
             for row in reader:
                 try:
@@ -49,7 +49,7 @@ class FlightsRespDAL(object):
         if self.get_airport("AMS") is not None:
             return
 
-        with open('airport-codes.csv', 'rb') as csvfile:
+        with open('db/airport-codes.csv', 'rb') as csvfile:
             reader = csv.reader(csvfile, delimiter=' ', quotechar='|')
             for row in reader:
                 try:
