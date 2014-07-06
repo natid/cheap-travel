@@ -7,8 +7,6 @@ from thread_pool import ThreadPool
 from flights_data.pricer import Pricer
 from db.flights_resp import FlightsRespDAL
 
-flights_resp_dal = FlightsRespDAL()
-
 def get_connections(origin, dest, queue):
     pricer = Pricer("Vayant")
 
@@ -64,7 +62,7 @@ def check_flights(origin, dest, connection, depart_date, return_date, results_di
 
         if "Round Trip" not in min_price[0]:
             dict_key = "%s-%s-%s-%s-%s" % (origin, dest, connection, depart_date, return_date)
-            flights_resp_dal.add_result(dict_key, prices)
+            flight_checker.pricer.flights_provider.flights_resp_dal.insert_result_to_db(dict_key, prices)
 
         #TODO - we need to make this thread safe
         # if results_dict.has_key(dict_key):
