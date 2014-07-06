@@ -18,6 +18,9 @@ class FlightsRespDAL(object):
         self.airline_collection = db.airline_collection
         self.airline_collection.create_index("airline_code")
 
+        self.results_collection = db.results_collection
+
+
         self.insert_airlines_to_db()
         self.insert_airports_to_db()
 
@@ -60,6 +63,13 @@ class FlightsRespDAL(object):
                 except:
                     continue
 
+    def insert_results_to_db(self, key, data):
+        self.results_collection.remove({"key": key})
+        new_dict = {}
+        new_dict['key'] = key
+        new_dict['value'] = data
+        self.results_collection.insert(new_dict)
+
     def set(self, key, data):
         self.remove(key)
 
@@ -67,6 +77,7 @@ class FlightsRespDAL(object):
         new_dict['key'] = key
         new_dict['value'] = data
         self.flights_collection.insert(new_dict)
+
 
     def get(self, key):
         data = self.flights_collection.find_one({"key": key}, fields= { 'value.Journeys' : { "$slice": constants.MAX_FLIGHTS_PER_TRIP }})
