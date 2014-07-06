@@ -64,11 +64,7 @@ class FlightsRespDAL(object):
                     continue
 
     def insert_results_to_db(self, key, data):
-        self.results_collection.remove({"key": key})
-        new_dict = {}
-        new_dict['key'] = key
-        new_dict['value'] = data
-        self.results_collection.insert(new_dict)
+        self.results_collection.update({"key": key}, {"$push": {"connections": data}}, upsert=True)
 
     def set(self, key, data):
         self.remove(key)
