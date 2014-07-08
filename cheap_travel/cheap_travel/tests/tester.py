@@ -72,20 +72,20 @@ def check_flights(origin, dest, connection, depart_date, return_date, results_di
         #     results_dict[dict_key] = min_price
 
 
+final_prices = {}
+
+origin_list = ['LON', 'BER', 'AMS', 'ROM', 'PAR', 'ZRH']
+dest_list = ['MNL', 'BKK', 'HKG', 'BJS']
+
+connections_list = [u'CPH', u'CTU', u'DOH', u'CMB', u'IST', u'CAI', u'KUL', u'DEL', u'CAN', u'MUC', u'PEK', u'FRA', u'SIN', u'BAH', u'AMM', u'KWI', u'BKK', u'MNL', u'PVG', u'SGN', u'AMS', u'HKG', u'BWN', u'SVO', u'TPE', u'ICN', u'HAN', u'AUH', u'ADD', u'LHR', u'HEL', u'ZRH', u'RUH', u'CDG', u'VIE', u'MAN', u'XMN', u'MAA', u'MCT', u'DXB', u'ARN', u'BOM']
+#connections_list = get_all_connections(origin_list, dest_list)
+
+depart_dates = [date(2014, 11, 02), date(2014, 9, 15), date(2015, 01, 01), date(2014, 8, 02), date(2014, 07, 25)]
+return_dates = [depart_date  + timedelta(days=21) for depart_date in depart_dates]
+return_dates += [depart_date  + timedelta(days=7) for depart_date in depart_dates]
+return_dates += [depart_date  + timedelta(days=80) for depart_date in depart_dates]
+
 if __name__ == "__main__":
-
-    final_prices = {}
-
-    origin_list = ['LON', 'BER', 'AMS', 'ROM', 'PAR', 'ZRH']
-    dest_list = ['MNL', 'BKK', 'HKG', 'BJS']
-
-    connections_list = [u'CPH', u'CTU', u'DOH', u'CMB', u'IST', u'CAI', u'KUL', u'DEL', u'CAN', u'MUC', u'PEK', u'FRA', u'SIN', u'BAH', u'AMM', u'KWI', u'BKK', u'MNL', u'PVG', u'SGN', u'AMS', u'HKG', u'BWN', u'SVO', u'TPE', u'ICN', u'HAN', u'AUH', u'ADD', u'LHR', u'HEL', u'ZRH', u'RUH', u'CDG', u'VIE', u'MAN', u'XMN', u'MAA', u'MCT', u'DXB', u'ARN', u'BOM']
-    #connections_list = get_all_connections(origin_list, dest_list)
-
-    depart_dates = [date(2014, 11, 02), date(2014, 9, 15), date(2015, 01, 01), date(2014, 07, 02), date(2014, 06, 25)]
-    return_dates = [depart_date  + timedelta(days=21) for depart_date in depart_dates]
-    return_dates += [depart_date  + timedelta(days=7) for depart_date in depart_dates]
-    return_dates += [depart_date  + timedelta(days=80) for depart_date in depart_dates]
 
     pool = ThreadPool(20, "flight_checker", FlightChecker)
 

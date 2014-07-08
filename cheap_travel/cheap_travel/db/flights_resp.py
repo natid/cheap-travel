@@ -66,6 +66,13 @@ class FlightsRespDAL(object):
     def insert_results_to_db(self, key, data):
         self.results_collection.update({"key": key}, {"$push": {"connections": data}}, upsert=True)
 
+    def get_results(self, key):
+        data = self.results_collection.find_one({"key": key})
+        if data:
+            return data["connections"]
+        else:
+            return
+
     def set(self, key, data):
         self.remove(key)
 
