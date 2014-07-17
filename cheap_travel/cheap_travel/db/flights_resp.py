@@ -23,9 +23,6 @@ class FlightsRespDAL(object):
         self.connections_collection = db.connections_collection
         self.connections_collection.create_index("area")
 
-        self.areas_collection = db.areas_collection
-        self.areas_collection.create_index("airport")
-
         self.insert_airlines_to_db()
         self.insert_airports_to_db()
 
@@ -129,10 +126,10 @@ class FlightsRespDAL(object):
         self.connections_collection.remove()
 
     def get_area_code(self, origin, dest):
-        origin_area = self.areas_collection.find_one({"airport": origin})
-        dest_area = self.areas_collection.find_one({"airport": dest})
+        origin_area = self.airport_collection.find_one({"airport_code": origin})
+        dest_area = self.airport_collection.find_one({"airport_code": dest})
 
         if origin_area and dest_area:
-            return "%s-%s" % (origin_area, dest_area)
+            return "%s-%s" % (origin_area["area"], dest_area["area"])
         else:
             return
