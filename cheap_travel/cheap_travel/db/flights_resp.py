@@ -1,7 +1,7 @@
 from pymongo import MongoClient
 import csv
 import constants
-
+import os
 
 class FlightsRespDAL(object):
 
@@ -20,6 +20,11 @@ class FlightsRespDAL(object):
 
         self.results_collection = db.results_collection
 
+        self.connections_collection = db.connections_collection
+        self.connections_collection.create_index("area")
+
+        self.areas_collection = db.areas_collection
+        self.areas_collection.create_index("airport")
 
         self.insert_airlines_to_db()
         self.insert_airports_to_db()
@@ -53,7 +58,7 @@ class FlightsRespDAL(object):
             reader = csv.reader(csvfile, delimiter=' ', quotechar='|')
             for row in reader:
                 try:
-                    if row[0] != "" and row[1] != "" and row[2] != "":
+                    if row[0] != "" and row[1] != "" and row[2] != "" and len(row[2].strip('",')) < 5 and  len(row[2].strip('",')) > 1:
                         new_dict = {}
                         new_dict['airport_code'] = row[2].strip('",')
                         new_dict['airport_country'] = row[1].strip('",')
@@ -106,3 +111,28 @@ class FlightsRespDAL(object):
         if value:
             return value['airline_name']
         return None
+
+    def get_all_airports(self):
+        return [airport['airport_code'] for airport in self.airport_collection.find()]
+
+    def add_connections_to_area(self, area, connections):
+        self.connections_collection.update({"area": area}, {"$push": {"connections": connections}}, upsert=True)
+
+    def get_connections_in_area(self, area):
+        data = self.connections_collection.find_one({"area": area})
+        if data:
+            return data["connections"]
+        else:
+            return
+
+    def clean_areas_to_connections_table(self):
+        self.connections_collection.remove()
+
+    def get_area_code(self, origin, dest):
+        origin_area = self.areas_collection.find_one({"airport": origin})
+        dest_area = self.areas_collection.find_one({"airport": dest})
+
+        if origin_area and dest_area:
+            return "%s-%s" % (origin_area, dest_area)
+        else:
+            return

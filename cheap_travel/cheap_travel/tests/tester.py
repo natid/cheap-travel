@@ -1,47 +1,7 @@
-import Queue
-import threading
-import time
 from datetime import date, timedelta
 from flights_data.flight_checks import FlightChecker
 from thread_pool import ThreadPool
 from flights_data.pricer import Pricer
-from db.flights_resp import FlightsRespDAL
-
-def get_connections(origin, dest, queue):
-    pricer = Pricer("Vayant")
-
-    go_trip_data = pricer.get_price_one_way(origin, dest, "2014-12-18")[1]
-    queue.put(pricer.flights_provider.get_connections_list(go_trip_data))
-
-
-def get_all_connections(origins, dests):
-    connections = set()
-    queue = Queue.Queue()
-    threads = []
-
-    for origin in origins:
-        for dest in dests:
-            if dest != origin:
-                while threading.activeCount() > 20:
-                    time.sleep(5)
-                t = threading.Thread(target=get_connections, args=(str(origin).upper(), str(dest).upper(), queue))
-                t.start()
-                threads.append(t)
-
-
-    for t in threads:
-        t.join()
-
-    for item in queue.get():
-        print "test"
-        connections.add(item)
-
-    print "nir "
-    print type(queue.get())
-    print connections
-
-    return connections
-
 
 def check_flights(origin, dest, connection, depart_date, return_date, results_dict, flight_checker):
     prices = []
