@@ -1,7 +1,7 @@
 from Queue import Queue
 from threading import Thread
 import time
-
+import traceback
 
 class Worker(Thread):
     """Thread executing tasks from a given tasks queue"""
@@ -27,15 +27,15 @@ class Worker(Thread):
             kargs[self.added_name] = self.added_instance
             print "worker number {0} going to do task number {1}".format(self.worker_number, task_number)
             duration = 0
-            try:
-                start_time = time.time()
-                func(*args, **kargs)
-                duration = time.time() - start_time
-            except Exception, e:
-                print e
-            finally:
-                self.tasks.task_done()
-                self.pool.task_ended(self.worker_number, task_number, duration)
+            #try:
+            start_time = time.time()
+            func(*args, **kargs)
+            duration = time.time() - start_time
+            #except Exception, e:
+                # print e
+            # finally:
+            #     self.tasks.task_done()
+            #     self.pool.task_ended(self.worker_number, task_number, duration)
 
 
 class ThreadPool(object):

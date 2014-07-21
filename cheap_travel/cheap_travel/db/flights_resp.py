@@ -1,8 +1,7 @@
 from pymongo import MongoClient
 import csv
 import constants
-import os
-
+from shapely.geometry import Polygon, Point
 class FlightsRespDAL(object):
 
     def __init__(self):
@@ -51,19 +50,50 @@ class FlightsRespDAL(object):
         if self.get_airport("AMS") is not None:
             return
 
-        with open('db/airport-codes.csv', 'rb') as csvfile:
-            reader = csv.reader(csvfile, delimiter=' ', quotechar='|')
+        with open('../db/new_airports', 'rb') as csvfile:
+            reader = csv.reader(csvfile)
             for row in reader:
                 try:
-                    if row[0] != "" and row[1] != "" and row[2] != "" and len(row[2].strip('",')) < 5 and  len(row[2].strip('",')) > 1:
+                    if row[1] != "" and row[3] != "" and row[4] != "" and row[6] != "" and row[7] != "" and len(row[4].strip('",')) < 5 and  len(row[4].strip('",')) > 1:
                         new_dict = {}
-                        new_dict['airport_code'] = row[2].strip('",')
-                        new_dict['airport_country'] = row[1].strip('",')
-                        new_dict['airport_name'] = row[0].strip('",')
-                        self.airport_collection.insert(new_dict)
-
+                        new_dict['airport_code'] = row[4].strip('",')
+                        new_dict['airport_country'] = row[3].strip('",')
+                        new_dict['airport_name'] = row[1].strip('",')
+                        lat = float(row[6])
+                        lng = float(row[7])
+                        new_dict["area"] = self._get_area(lat, lng)
+                        if new_dict["area"] != -1:
+                            self.airport_collection.insert(new_dict)
+                        else:
+                            print row
                 except:
                     continue
+    def _get_area(self, lat, lng):
+        areas = [constants.AREA_SOUTH_AMERICA ,
+                 constants.AREA_CENTRAL_AMERICA ,
+                 constants.AREA_WEST_AMERICA,
+                 constants.AREA_EAST_AMERICA,
+                 constants.AREA_AFRICA ,
+                 constants.AREA_EUROPE,
+                 constants.AREA_ASIA,
+                 constants.AREA_AUSTRALIA,
+                 constants.AREA_PACIFIC_ISLANDS]
+
+        for area in areas:
+            if self._is_in_area(lat, lng, area[0]):
+                return area[1]
+
+        #print "ERROR - couldn't find area for this airport"
+        return -1
+
+    def _is_in_area(self, lat, lng, coordinates):
+        area = Polygon(coordinates)
+        point = Point(lat,lng)
+        return area.contains(point)
+        # if lat < coordinates[0][0] and lat < coordinates[1][0] and lat > coordinates[2][0] and lat > coordinates[3][0] \
+        #     and lng > coordinates[0][1] and lng < coordinates[1][1] and lng > coordinates[2][1] and lng < coordinates[3][1]:
+        #     return True
+        # return False
 
     def insert_results_to_db(self, key, data):
         self.results_collection.update({"key": key}, {"$push": {"connections": data}}, upsert=True)
@@ -113,7 +143,7 @@ class FlightsRespDAL(object):
         return [airport['airport_code'] for airport in self.airport_collection.find()]
 
     def add_connections_to_area(self, area, connections):
-        self.connections_collection.update({"area": area}, {"$push": {"connections": connections}}, upsert=True)
+        self.connections_collection.update({"area": area}, {"$push": {"connections": list(connections)}}, upsert=True)
 
     def get_connections_in_area(self, area):
         data = self.connections_collection.find_one({"area": area})
@@ -133,3 +163,5 @@ class FlightsRespDAL(object):
             return "%s-%s" % (origin_area["area"], dest_area["area"])
         else:
             return
+
+FlightsRespDAL()

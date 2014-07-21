@@ -2,7 +2,7 @@ from thread_pool import ThreadPool
 from random import randint
 from flights_data.flight_checks import FlightChecker
 from datetime import timedelta, date
-
+import csv
 def get_connections(origin, dest, date, flight_checker):
 
     go_trip_data = flight_checker.pricer.get_price_one_way(origin, dest, date)[1]
@@ -18,7 +18,15 @@ def get_area(flight_checker, origin, dest):
 if __name__ == "__main__":
     areas=set()
     flight_checker = FlightChecker()
-    origins = dests = flight_checker.pricer.flights_provider.flights_resp_dal.get_all_airports()
+    nir = []
+    airports = []
+    with open('../db/top-100.csv', 'rb') as csvfile:
+        reader = csv.reader(csvfile)
+        for row in reader:
+            for airport in row:
+                airports.append(airport)
+
+    origins = dests = airports
 
     dates = []
 
