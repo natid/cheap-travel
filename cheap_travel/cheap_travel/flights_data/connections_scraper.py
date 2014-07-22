@@ -54,7 +54,7 @@ if __name__ == "__main__":
         conn_list = flight_checker.pricer.flights_provider.flights_resp_dal.get_connections_in_area(area)
         connections = set()
         for conn in conn_list:
-            connections.add(conn)
+            connections.update(set(conn))
         areas_conn[area] = connections
 
     flight_checker.pricer.flights_provider.flights_resp_dal.clean_areas_to_connections_table()

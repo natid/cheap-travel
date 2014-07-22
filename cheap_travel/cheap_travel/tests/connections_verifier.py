@@ -15,5 +15,10 @@ if __name__ == "__main__":
 
             print "----------------------------"
             print "connections for flights from {} to {}".format(area1[2], area2[2])
-            for connection in connections:
-                print connection, flights_resp_dal.get_airport(connection)
+            if connections:
+                for connection in connections[0]:
+                    airport = flights_resp_dal.get_airport(connection)
+                    if airport:
+                        print "code = {}, airport = {}, country = {}".format(connection, airport[0], airport[1])
+                    else:
+                        print "unknown details for airport code {}".format(connection)

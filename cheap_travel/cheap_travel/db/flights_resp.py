@@ -115,7 +115,7 @@ class FlightsRespDAL(object):
     def get_airport(self, code):
         value = self.airport_collection.find_one({"airport_code": code})
         if value:
-            return value['airport_name']
+            return (value['airport_name'], value['airport_country'])
         return None
 
     def get_airline(self, code):
@@ -148,5 +148,3 @@ class FlightsRespDAL(object):
             return "%s-%s" % (origin_area["area"], dest_area["area"])
         else:
             return
-
-FlightsRespDAL()
