@@ -4,18 +4,13 @@ from flights_data.pricer import Pricer
 from flights_data.flight_checks import FlightChecker
 import time
 
-def check_flights(origin, dest, first_connection, depart_date, return_date, results_dict, flight_checker):
+def check_flights(origin, dest, connection, depart_date, return_date, results_dict, flight_checker):
 
     prices = []
-    test_list = (flight_checker.check_round_trip,
-                 flight_checker.check_two_one_ways,
-                 flight_checker.check_connection_in_the_beginning,
-                 flight_checker.check_connection_in_the_end,
-                 flight_checker.check_two_connections_stay_in_the_beginning,
-                 flight_checker.check_two_connections_stay_in_the_end)
+    test_list = flight_checker.get_test_list()
 
     for test in test_list:
-        data = test(origin, dest, depart_date, return_date, first_connection, None)
+        data = test(origin, dest, depart_date, return_date, connection, None)
         if data:
             prices.append(data)
 
@@ -35,6 +30,7 @@ def check_flights(origin, dest, first_connection, depart_date, return_date, resu
 if __name__ == "__main__":
     start_time = time.time()
     final_prices = {}
+    flight_checker = FlightChecker()
 
     origin = 'TLV'
     dest = 'BKK'
@@ -42,23 +38,23 @@ if __name__ == "__main__":
     depart_date = date(2014, 11, 18)
     return_date = date(2014, 12, 26)
 
-    connections_list = [u'CPH', u'CTU', u'DOH', u'CMB', u'IST', u'CAI', u'KUL', u'DEL', u'CAN', u'MUC', u'PEK', u'FRA', u'SIN', u'BAH', u'AMM', u'KWI', u'BKK', u'MNL', u'PVG', u'SGN', u'AMS', u'HKG', u'BWN', u'SVO', u'TPE', u'ICN', u'HAN', u'AUH', u'ADD', u'LHR', u'HEL', u'ZRH', u'RUH', u'CDG', u'VIE', u'MAN', u'XMN', u'MAA', u'MCT', u'DXB', u'ARN', u'BOM']
+    area = flight_checker.pricer.flights_provider.flights_resp_dal.get_area_code(origin, dest)
+    connections_list = flight_checker.pricer.flights_provider.flights_resp_dal.get_connections_in_area()
+    #connections_list = [u'CPH', u'CTU', u'DOH', u'CMB', u'IST', u'CAI', u'KUL', u'DEL', u'CAN', u'MUC', u'PEK', u'FRA', u'SIN', u'BAH', u'AMM', u'KWI', u'BKK', u'MNL', u'PVG', u'SGN', u'AMS', u'HKG', u'BWN', u'SVO', u'TPE', u'ICN', u'HAN', u'AUH', u'ADD', u'LHR', u'HEL', u'ZRH', u'RUH', u'CDG', u'VIE', u'MAN', u'XMN', u'MAA', u'MCT', u'DXB', u'ARN', u'BOM']
 
     pool = ThreadPool(20, "flight_checker", FlightChecker)
 
     for single_connection in connections_list:
-        cities = [origin, dest, single_connection]
-        if len(cities) == len(set(cities)):
+        if origin != dest != single_connection != origin:
             pool.add_task(check_flights, origin, dest, single_connection, depart_date, return_date, final_prices)
     pool.start()
     pool.wait_completion()
 
     print final_prices
     for cities, price in final_prices.iteritems():
-        #if "Round Trip" not in price[0]:
         print "{}, {}, price = {}, flights information is: \n".format(cities, price[0], price[1])
         for flight in price[2]:
-            Pricer("Vayant").flights_provider.print_single_flight(flight)
+            flight_checker.pricer.flights_provider.print_single_flight(flight)
 
 
     print "total time it took = {}".format(time.time()-start_time)

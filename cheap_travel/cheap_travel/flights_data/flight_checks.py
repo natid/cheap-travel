@@ -10,6 +10,14 @@ class FlightChecker(object):
     def __init__(self):
         self.pricer = Pricer("Vayant")
 
+    def get_test_list(self):
+        return (self.check_round_trip,
+                self.check_two_one_ways,
+                self.check_connection_in_the_beginning,
+                self.check_connection_in_the_end,
+                self.check_two_connections_stay_in_the_beginning,
+                self.check_two_connections_stay_in_the_end)
+
     def check_round_trip(self, origin, dest, depart_date, return_date, connection1, connection2):
         price1, trip_data1 = self.pricer.get_price_round_trip(origin, dest, self._create_str_date(depart_date),
                                                               self._create_str_date(return_date))

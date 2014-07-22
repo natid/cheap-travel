@@ -5,12 +5,7 @@ from flights_data.pricer import Pricer
 
 def check_flights(origin, dest, connection, depart_date, return_date, results_dict, flight_checker):
     prices = []
-    test_list = (flight_checker.check_round_trip,
-                 flight_checker.check_two_one_ways,
-                 flight_checker.check_connection_in_the_beginning,
-                 flight_checker.check_connection_in_the_end,
-                 flight_checker.check_two_connections_stay_in_the_beginning,
-                 flight_checker.check_two_connections_stay_in_the_end)
+    test_list = flight_checker.get_test_list()
 
     for test in test_list:
         data = test(origin, dest, depart_date, return_date, connection, None)

@@ -69,31 +69,16 @@ class FlightsRespDAL(object):
                 except:
                     continue
     def _get_area(self, lat, lng):
-        areas = [constants.AREA_SOUTH_AMERICA ,
-                 constants.AREA_CENTRAL_AMERICA ,
-                 constants.AREA_WEST_AMERICA,
-                 constants.AREA_EAST_AMERICA,
-                 constants.AREA_AFRICA ,
-                 constants.AREA_EUROPE,
-                 constants.AREA_ASIA,
-                 constants.AREA_AUSTRALIA,
-                 constants.AREA_PACIFIC_ISLANDS]
-
-        for area in areas:
+        for area in constants.areas:
             if self._is_in_area(lat, lng, area[0]):
                 return area[1]
 
-        #print "ERROR - couldn't find area for this airport"
         return -1
 
     def _is_in_area(self, lat, lng, coordinates):
         area = Polygon(coordinates)
         point = Point(lat,lng)
         return area.contains(point)
-        # if lat < coordinates[0][0] and lat < coordinates[1][0] and lat > coordinates[2][0] and lat > coordinates[3][0] \
-        #     and lng > coordinates[0][1] and lng < coordinates[1][1] and lng > coordinates[2][1] and lng < coordinates[3][1]:
-        #     return True
-        # return False
 
     def insert_results_to_db(self, key, data):
         self.results_collection.update({"key": key}, {"$push": {"connections": data}}, upsert=True)

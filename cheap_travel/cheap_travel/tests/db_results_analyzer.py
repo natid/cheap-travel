@@ -66,10 +66,10 @@ if __name__ == "__main__":
                                 all +=1
                             num +=1
 
-pprint(sorted(results, reverse=True))
+    pprint(sorted(results, reverse=True))
 
-print sum/num
-print num
-print all
+    print sum/num
+    print num
+    print all
 
 
