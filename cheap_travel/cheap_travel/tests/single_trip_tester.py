@@ -28,6 +28,8 @@ def check_flights(origin, dest, connection, depart_date, return_date, results_di
 
 
 if __name__ == "__main__":
+
+def test
     start_time = time.time()
     final_prices = {}
     flight_checker = FlightChecker()
