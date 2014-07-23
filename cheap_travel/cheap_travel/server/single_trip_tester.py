@@ -25,9 +25,8 @@ def check_flights(origin, dest, connection, depart_date, return_date, results_di
 
 
 
-def get_single_check(origin, dest, depart_date, return_date):
+def get_single_check(origin, dest, depart_date, return_date, flight_checker):
     final_prices = {}
-    flight_checker = FlightChecker()
 
     area = flight_checker.pricer.flights_provider.flights_resp_dal.get_area_code(origin, dest)
     connections_list = flight_checker.pricer.flights_provider.flights_resp_dal.get_connections_in_area(area)
