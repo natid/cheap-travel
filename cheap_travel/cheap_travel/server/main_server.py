@@ -3,6 +3,7 @@ from flask import request
 import time
 import thread
 from flights_data.flight_checks import FlightChecker
+import datetime
 
 import single_trip_tester
 
@@ -33,7 +34,7 @@ def get_results():
 
     if origin and destination and departure_date and return_date:
         response = "you searched for a flight from {} to {} leaving at {} and returning at {}<BR><BR> we are working on it...".format(origin, destination, departure_date, return_date) + get_redirect_code()
-
+        print origin, destination, departure_date, return_date
         thread.start_new_thread(run_single_request, (origin, destination, departure_date, return_date))
 
         #for test
@@ -63,12 +64,16 @@ def run_single_request(origin, destination, departure_date, return_date):
     flight_checker = FlightChecker()
 
     response = ""
-    final_prices = single_trip_tester.get_single_check(origin, destination, departure_date, return_date, flight_checker)
+    final_prices = single_trip_tester.get_single_check(origin,
+                                                       destination,
+                                                       datetime.datetime.strptime(departure_date, "%Y-%m-%d"),
+                                                       datetime.datetime.strptime(return_date, "%Y-%m-%d"),
+                                                       flight_checker)
 
-    for cities, price in final_prices.iteritems():
-        response += "{}, {}, price = {}, flights information is: \n".format(cities, price[0], price[1])
-        for flight in price[2]:
-            response += flight_checker.pricer.flights_provider.print_single_flight(flight)
+    round_trip_price, cheapest_price, cheapest_flight, cheapest_type = single_trip_tester.get_cheapest_flight(final_prices)
+    response += "round trip price = {}, cheapest price = {} , cheapest type = {} , flights information is: \n".format(round_trip_price, cheapest_price, cheapest_type)
+    for flight in cheapest_flight:
+        response += flight_checker.pricer.flights_provider.print_single_flight(flight)
 
     response += "total time it took = {}".format(time.time()-start_time)
 
@@ -76,6 +81,10 @@ def run_single_request(origin, destination, departure_date, return_date):
 
 @app.route("/get_result")
 def check_result():
+    #TODO - see how we can get these parameters - probably through some sort of a cookie
+    # dict_key = single_trip_tester.get_dict_key(origin, dest, depart_date, return_date)
+    # result_for_user = FlightChecker().pricer.flights_provider.flights_resp_dal.get_results(dict_key)
+
     global result_for_user
 
     if result_for_user:

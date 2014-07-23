@@ -19,6 +19,22 @@ def check_flights(origin, dest, connection, depart_date, return_date, flight_che
 def get_dict_key(origin, dest, depart_date, return_date):
     return "%s-%s, %s, %s" % (origin, dest, depart_date, return_date)
 
+def get_cheapest_flight(final_prices):
+    if final_prices:
+        assert("Round Trip" in final_prices[0][0][0])
+        round_trip_price = cheapest_trip_price = final_prices[0][0][1]
+        cheapest_flight = final_prices[0][0][2]
+        cheapest_type = final_prices[0][0][0]
+        for options in final_prices:
+            for price in options:
+                if price[1] < cheapest_trip_price:
+                    cheapest_type = price[0]
+                    cheapest_trip_price = price[1]
+                    cheapest_flight = price[2]
+
+        return round_trip_price, cheapest_trip_price, cheapest_flight, cheapest_type
+    else:
+        return None, None, None, None
 
 def get_single_check(origin, dest, depart_date, return_date, flight_checker):
 

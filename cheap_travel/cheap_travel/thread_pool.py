@@ -33,6 +33,7 @@ class Worker(Thread):
                 duration = time.time() - start_time
             except Exception, e:
                 print e
+                traceback.print_exc()
             finally:
                 self.tasks.task_done()
                 self.pool.task_ended(self.worker_number, task_number, duration)

@@ -1,29 +1,30 @@
-from server.single_trip_tester import get_single_check
-
 import pickle
-
-final_prices = {}
+import datetime
+from server.single_trip_tester import get_single_check, get_cheapest_flight
+from flights_data.flight_checks import FlightChecker
 
 if __name__ == "__main__":
 
     tests_to_run = []
     prices = []
-    with open("tests.info", "rb") as tests_file:
+
+    i=0
+    with open("tests.info", "rU") as tests_file:
         while True:
             try:
                 test = pickle.load(tests_file)
+                i+=1
                 tests_to_run.append(test)
-            except:
+            except EOFError:
+                print "Finished loading %d tests" % i
                 break
 
-    for test in tests_to_run:
-        final_prices = get_single_check(*test)
 
-        for cities, price in final_prices.iteritems():
-            if "Round Trip" in price[0]:
-                round_trip_price = price[1]
-            else:
-                cheapest_trip_price = price[1]
+    for test in tests_to_run:
+        print test
+        final_prices = get_single_check(*test, flight_checker=FlightChecker())
+
+        round_trip_price, cheapest_trip_price, flight, cheapest_type = get_cheapest_flight(final_prices)
         prices.append((round_trip_price, cheapest_trip_price))
 
     total_precentage_saving = 0
@@ -33,5 +34,4 @@ if __name__ == "__main__":
 
     saved_in_avergae = total_precentage_saving/len(prices)
 
-    print saved_in_avergae
-
+    print saved_in_avergae, len(prices)

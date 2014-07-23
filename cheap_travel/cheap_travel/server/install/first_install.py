@@ -7,7 +7,7 @@ def insert_airlines_to_db(flights_dal):
     #remove all keys
     flights_dal.airline_collection.remove()
 
-    with open('../csv_files/airlines.csv', 'rb') as csvfile:
+    with open('csv_files/airlines.csv', 'rb') as csvfile:
         reader = csv.reader(csvfile, delimiter=',', quotechar='|')
         for row in reader:
             try:
@@ -24,7 +24,7 @@ def insert_airports_to_db(flights_dal):
     #remove all keys
     flights_dal.airport_collection.remove()
 
-    with open('../csv_files/all_airports', 'rb') as csvfile:
+    with open('csv_files/all_airports', 'rb') as csvfile:
         reader = csv.reader(csvfile)
         for row in reader:
             try:
@@ -38,8 +38,6 @@ def insert_airports_to_db(flights_dal):
                     new_dict["area"] = flights_dal._get_area(lat, lng)
                     if new_dict["area"] != -1:
                         flights_dal.airport_collection.insert(new_dict)
-                    else:
-                        print row
             except:
                 continue
 
@@ -50,4 +48,4 @@ if __name__ == "__main__":
     insert_airlines_to_db(flights_resp_dal)
     insert_airports_to_db(flights_resp_dal)
 
-    connections_scraper.scrap_connections(flights_resp_dal)
+    #connections_scraper.scrap_connections(flights_resp_dal)
