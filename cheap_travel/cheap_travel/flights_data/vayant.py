@@ -18,7 +18,7 @@ demo_request_json = {
             "ResponseType": "json",
             "PassengerTypes": [{"TypeId": 1, "PaxType": "Adult"}],
             "TripSegments": [],
-            "Preferences": {"CheckAvailability": "true",}, #"SplitTickets": { "AllowSplitTickets": "true" },},
+            "Preferences": {"CheckAvailability": "true", },  #"SplitTickets": { "AllowSplitTickets": "true" },},
             "Channels": [{"Id": 1, "Provider": "Amadeus"},
                          {"Id": 2, "Provider": "WorldSpan"},
                          {"Id": 3, "Provider": "Galileo"},
@@ -36,7 +36,6 @@ demo_request_json = {
 
 
 class VayantConnector(object):
-
     def __init__(self):
         self.flights_resp_dal = FlightsRespDAL()
 
@@ -46,7 +45,7 @@ class VayantConnector(object):
         #a = time.time()
         cached_resp = self.flights_resp_dal.get(key)
         #print "Query time is {} size is {}".format(time.time() - a, sys.getsizeof
-        while self.flights_resp_dal.has_key(key) and cached_resp is None :
+        while self.flights_resp_dal.has_key(key) and cached_resp is None:
             time.sleep(5)
             cached_resp = self.flights_resp_dal.get(key)
         if cached_resp:
@@ -64,7 +63,7 @@ class VayantConnector(object):
             resp = self._decompress_and_extract_json(response)
 
             if resp.has_key('Response') and resp['Response'] == 'Error':
-                print "ERROR!!! "+ resp['Message']
+                print "ERROR!!! " + resp['Message']
                 print json.dumps(trip)
                 self.flights_resp_dal.remove(key)
                 return None
@@ -73,7 +72,6 @@ class VayantConnector(object):
         finally:
             if not resp:
                 self.flights_resp_dal.remove(key)
-
 
         return resp
 
@@ -89,7 +87,7 @@ class VayantConnector(object):
 
 
     def _decompress_and_extract_json(self, response):
-        decompressor = zlib.decompressobj(16+zlib.MAX_WBITS)
+        decompressor = zlib.decompressobj(16 + zlib.MAX_WBITS)
 
         json_resp = ""
 
@@ -124,18 +122,19 @@ class VayantConnector(object):
             self.print_single_flight(flight[0])
 
     def print_single_flight(self, flight):
-        #print flight["Fares"][0]
-        print flight["Fares"][0]["Origin"] + " -> " + flight["Fares"][0]["Destination"] + ":"
-        print "total price = {}".format(flight['Price']['Total']['Amount'])
-        print "flights details: "
+        response = ""
+        response += flight["Fares"][0]["Origin"] + " -> " + flight["Fares"][0]["Destination"] + ":"
+        response += "total price = {}".format(flight['Price']['Total']['Amount'])
+        response += "flights details: "
         for leg in flight["Flights"]:
-            print "\t" + leg["Origin"] + " -> " + leg["Destination"] + ":"
-            print "\t departure: "+ leg["Departure"]
-            print "\t arrival: " + leg["Arrival"]
+            response += "\t" + leg["Origin"] + " -> " + leg["Destination"] + ":"
+            response += "\t departure: " + leg["Departure"]
+            response += "\t arrival: " + leg["Arrival"]
             if self.flights_resp_dal.get_airline(leg["OperatingCarrier"]) is not None:
-                print "\t carrier: " + self.flights_resp_dal.get_airline(leg["OperatingCarrier"])
+                response += "\t carrier: " + self.flights_resp_dal.get_airline(leg["OperatingCarrier"])
             else:
-                print "\t carrier: " + leg["OperatingCarrier"]
+                response += "\t carrier: " + leg["OperatingCarrier"]
+        return response
 
     def get_first_flight_from_trip(self, trip_data):
         return trip_data['Journeys'][0][0]
@@ -151,13 +150,13 @@ class VayantConnector(object):
         try:
             return sorted_response[0][0]['Price']['Total']['Amount']
         except:
-            print "ERROR getting the price" , resp, sorted_response
+            print "ERROR getting the price", resp, sorted_response
             return 0
 
     def get_connections_list(self, trip):
-        connections=set()
+        connections = set()
         for single in trip['Journeys']:
-            if len(single[0]["Flights"]) == 2 :
+            if len(single[0]["Flights"]) == 2:
                 if single[0]["Flights"][0]["Destination"] == single[0]["Flights"][1]["Origin"]:
                     connections.add(single[0]["Flights"][0]["Destination"])
         return connections
@@ -171,7 +170,7 @@ class VayantConnector(object):
     def get_dest_flights_in_two_way(self, trip, connection):
         for i in xrange(len(trip['Flights'])):
             if trip['Flights'][i]['Destination'] == connection:
-                return trip['Flights'][i], trip['Flights'][i+1]
+                return trip['Flights'][i], trip['Flights'][i + 1]
 
         return None, None
 

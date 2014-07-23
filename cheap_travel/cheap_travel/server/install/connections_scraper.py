@@ -3,24 +3,24 @@ from random import randint
 from flights_data.flight_checks import FlightChecker
 from datetime import timedelta, date
 import csv
+
+
 def get_connections(origin, dest, date, flight_checker):
 
     go_trip_data = flight_checker.pricer.get_price_one_way(origin, dest, date)[1]
     connections= flight_checker.pricer.flights_provider.get_connections_list(go_trip_data)
 
-    flight_checker.pricer.flights_provider.flights_resp_dal.add_connections_to_area(get_area(flight_checker, origin, dest), connections)
+    area = get_area(flight_checker.pricer.flights_provider.flights_resp_dal, origin, dest)
+    flight_checker.pricer.flights_provider.flights_resp_dal.add_connections_to_area(area, connections)
 
+def get_area(flights_resp_dal, origin, dest):
+    return flights_resp_dal.get_area_code(origin, dest)
 
-def get_area(flight_checker, origin, dest):
-    return flight_checker.pricer.flights_provider.flights_resp_dal.get_area_code(origin, dest)
-
-
-if __name__ == "__main__":
+def scrap_connections(flights_resp_dal):
     areas=set()
-    flight_checker = FlightChecker()
     nir = []
     airports = []
-    with open('../db/top-100.csv', 'rb') as csvfile:
+    with open('../csv_files/top_100_airports.csv', 'rb') as csvfile:
         reader = csv.reader(csvfile)
         for row in reader:
             for airport in row:
@@ -42,7 +42,7 @@ if __name__ == "__main__":
             if dest != origin:
                 date = dates[randint(0, len(dates)-1)]
                 pool.add_task(get_connections, origin, dest, date)
-                areas.add(get_area(flight_checker, origin, dest))
+                areas.add(get_area(flights_resp_dal, origin, dest))
 
     pool.start()
     pool.wait_completion()
@@ -51,16 +51,18 @@ if __name__ == "__main__":
     #arrange all connections in single set per area instead of list
     areas_conn = dict()
     for area in areas:
-        conn_list = flight_checker.pricer.flights_provider.flights_resp_dal.get_connections_in_area(area)
+        conn_list = flights_resp_dal.get_connections_in_area(area)
         connections = set()
         for conn in conn_list:
             connections.update(set(conn))
         areas_conn[area] = connections
 
-    flight_checker.pricer.flights_provider.flights_resp_dal.clean_areas_to_connections_table()
+    flights_resp_dal.clean_areas_to_connections_table()
 
     for area in areas:
-        flight_checker.pricer.flights_provider.flights_resp_dal.add_connections_to_area(area, areas_conn[area])
+        flights_resp_dal.add_connections_to_area(area, areas_conn[area])
 
 
 
+if __name__ == "__main__":
+    scrap_connections()

@@ -1,8 +1,5 @@
-from datetime import date
 from thread_pool import ThreadPool
-from flights_data.pricer import Pricer
 from flights_data.flight_checks import FlightChecker
-import time
 
 def check_flights(origin, dest, connection, depart_date, return_date, results_dict, flight_checker):
 
@@ -27,22 +24,13 @@ def check_flights(origin, dest, connection, depart_date, return_date, results_di
 
 
 
-if __name__ == "__main__":
 
-def test
-    start_time = time.time()
+def get_single_check(origin, dest, depart_date, return_date):
     final_prices = {}
     flight_checker = FlightChecker()
 
-    origin = 'SLC'
-    dest = 'SOF'
-
-    depart_date = date(2014, 11, 18)
-    return_date = date(2014, 12, 26)
-
     area = flight_checker.pricer.flights_provider.flights_resp_dal.get_area_code(origin, dest)
     connections_list = flight_checker.pricer.flights_provider.flights_resp_dal.get_connections_in_area(area)
-    #connections_list = [u'CPH', u'CTU', u'DOH', u'CMB', u'IST', u'CAI', u'KUL', u'DEL', u'CAN', u'MUC', u'PEK', u'FRA', u'SIN', u'BAH', u'AMM', u'KWI', u'BKK', u'MNL', u'PVG', u'SGN', u'AMS', u'HKG', u'BWN', u'SVO', u'TPE', u'ICN', u'HAN', u'AUH', u'ADD', u'LHR', u'HEL', u'ZRH', u'RUH', u'CDG', u'VIE', u'MAN', u'XMN', u'MAA', u'MCT', u'DXB', u'ARN', u'BOM']
 
     pool = ThreadPool(20, "flight_checker", FlightChecker)
 
@@ -54,12 +42,4 @@ def test
     pool.start()
     pool.wait_completion()
 
-    print final_prices
-    for cities, price in final_prices.iteritems():
-        print "{}, {}, price = {}, flights information is: \n".format(cities, price[0], price[1])
-        for flight in price[2]:
-            flight_checker.pricer.flights_provider.print_single_flight(flight)
-
-
-    print "total time it took = {}".format(time.time()-start_time)
-
+    return final_prices

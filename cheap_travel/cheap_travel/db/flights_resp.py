@@ -1,5 +1,4 @@
 from pymongo import MongoClient
-import csv
 import constants
 from shapely.geometry import Polygon, Point
 class FlightsRespDAL(object):
@@ -10,6 +9,8 @@ class FlightsRespDAL(object):
 
         self.flights_collection = db.flights_collection
         self.flights_collection.create_index("key")
+        #remove all keys without values
+        self.flights_collection.remove({"value": None})
 
         self.airport_collection = db.airport_collection
         self.airport_collection.create_index("airport_code")
@@ -17,57 +18,12 @@ class FlightsRespDAL(object):
         self.airline_collection = db.airline_collection
         self.airline_collection.create_index("airline_code")
 
-        self.results_collection = db.results_collection
-
         self.connections_collection = db.connections_collection
         self.connections_collection.create_index("area")
 
-        self.insert_airlines_to_db()
-        self.insert_airports_to_db()
-
-        #remove all keys without values
-        self.flights_collection.remove({"value": None})
+        self.results_collection = db.results_collection
 
 
-    def insert_airlines_to_db(self):
-        if self.get_airline("DL") is not None:
-            return
-
-        with open('db/airlines.csv', 'rb') as csvfile:
-            reader = csv.reader(csvfile, delimiter=',', quotechar='|')
-            for row in reader:
-                try:
-                    if row[0] != "" and row[1] != "":
-                        new_dict = {}
-                        new_dict['airline_code'] = row[1]
-                        new_dict['airline_name'] = row[0]
-                        self.airline_collection.insert(new_dict)
-
-                except:
-                    continue
-
-    def insert_airports_to_db(self):
-        if self.get_airport("AMS") is not None:
-            return
-
-        with open('../db/new_airports', 'rb') as csvfile:
-            reader = csv.reader(csvfile)
-            for row in reader:
-                try:
-                    if row[1] != "" and row[3] != "" and row[4] != "" and row[6] != "" and row[7] != "" and len(row[4].strip('",')) < 5 and  len(row[4].strip('",')) > 1:
-                        new_dict = {}
-                        new_dict['airport_code'] = row[4].strip('",')
-                        new_dict['airport_country'] = row[3].strip('",')
-                        new_dict['airport_name'] = row[1].strip('",')
-                        lat = float(row[6])
-                        lng = float(row[7])
-                        new_dict["area"] = self._get_area(lat, lng)
-                        if new_dict["area"] != -1:
-                            self.airport_collection.insert(new_dict)
-                        else:
-                            print row
-                except:
-                    continue
     def _get_area(self, lat, lng):
         for area in constants.areas:
             if self._is_in_area(lat, lng, area[0]):
