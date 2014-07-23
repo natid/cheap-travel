@@ -9,14 +9,14 @@ app = Flask(__name__)
 
 @app.route("/")
 def hello():
-    response = "Single Trip Tester<br><br>"
-    response +=  '<form name="myform" action="http://127.0.0.1:5000/search" method="GET">'
-    response +=  'Origin:<br> <input type="text" name="origin" maxlength="5"><br>'
-    response +=  'Dest:<br> <input type="text" name="destination" maxlength="5"><br>'
-    response +=  'Departure Date:<br> <input type="date" name="departure_date"><br>'
-    response +=  'Return Date:<br> <input type="date" name="return_date"><br><br>'
-    response += '<input type="submit" value="search">'
-    response += '</form>'
+    response = "Single Trip Tester<br><br>" \
+              '<form name="myform" action="http://127.0.0.1:5000/search" method="GET">' \
+              'Origin:<br> <input type="text" name="origin" maxlength="5"><br>' \
+              'Dest:<br> <input type="text" name="destination" maxlength="5"><br>' \
+              'Departure Date:<br> <input type="date" name="departure_date"><br>' \
+              'Return Date:<br> <input type="date" name="return_date"><br><br>' \
+              '<input type="submit" value="search">' \
+              '</form>'
 
     return response
 
