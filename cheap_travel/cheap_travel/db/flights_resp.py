@@ -74,6 +74,9 @@ class FlightsRespDAL(object):
             return (value['airport_name'], value['airport_country'])
         return None
 
+    def get_all_airports(self):
+        return self.airport_collection.find()
+
     def get_airline(self, code):
         value = self.airline_collection.find_one({"airline_code": code})
         if value:
