@@ -77,6 +77,7 @@ def run_single_request(origin, destination, departure_date, return_date):
 
     response += "total time it took = {}".format(time.time()-start_time)
 
+    response = response.replace("\n", "<br>")
     result_for_user = response
 
 @app.route("/get_result")
