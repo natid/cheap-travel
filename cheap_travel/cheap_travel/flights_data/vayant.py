@@ -63,8 +63,8 @@ class VayantConnector(object):
             resp = self._decompress_and_extract_json(response)
 
             if resp.has_key('Response') and resp['Response'] == 'Error':
-                print "ERROR!!! " + resp['Message']
-                print json.dumps(trip)
+                print "ERROR!!! flight info: {}->{}".format(trip["Origin"][0], trip["Destination"][0]) + resp['Message']
+                #print json.dumps(trip)
                 self.flights_resp_dal.remove(key)
                 return None
 
