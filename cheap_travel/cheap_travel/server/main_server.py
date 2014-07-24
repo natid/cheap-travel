@@ -46,7 +46,7 @@ def get_results():
 
 def get_redirect_code():
      return '<script type="text/JavaScript">' \
-            'redirectTime = "1500";' \
+            'redirectTime = "5000";' \
             'redirectURL = "http://127.0.0.1:5000/get_result";' \
             'function timedRedirect() {' \
             'setTimeout("location.href = redirectURL;",redirectTime);}'\
