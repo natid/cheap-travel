@@ -1,17 +1,20 @@
 from thread_pool import ThreadPool
 from random import randint
 from flights_data.flight_checks import FlightChecker
-from datetime import timedelta, date
+from datetime import timedelta
+import datetime
 import csv
 
 
 def get_connections(origin, dest, date, flight_checker):
 
     go_trip_data = flight_checker.pricer.get_price_one_way(origin, dest, date)[1]
-    connections= flight_checker.pricer.flights_provider.get_connections_list(go_trip_data)
 
-    area = get_area(flight_checker.pricer.flights_provider.flights_resp_dal, origin, dest)
-    flight_checker.pricer.flights_provider.flights_resp_dal.add_connections_to_area(area, connections)
+    if go_trip_data:
+        connections= flight_checker.pricer.flights_provider.get_connections_list(go_trip_data)
+
+        area = get_area(flight_checker.pricer.flights_provider.flights_resp_dal, origin, dest)
+        flight_checker.pricer.flights_provider.flights_resp_dal.add_connections_to_area(area, connections)
 
 def get_area(flights_resp_dal, origin, dest):
     return flights_resp_dal.get_area_code(origin, dest)
@@ -20,7 +23,7 @@ def scrap_connections(flights_resp_dal):
     areas=set()
     nir = []
     airports = []
-    with open('../csv_files/top_100_airports.csv', 'rb') as csvfile:
+    with open('csv_files/top_100_airports.csv', 'rb') as csvfile:
         reader = csv.reader(csvfile)
         for row in reader:
             for airport in row:
@@ -31,7 +34,7 @@ def scrap_connections(flights_resp_dal):
     dates = []
 
     for i in range(100):
-        new_date = date(2014, 11, 02) + timedelta(days=i)
+        new_date = datetime.date(2014, 11, 02) + timedelta(days=i)
         dates.append(new_date.strftime("%Y-%m-%d"))
 
 
@@ -65,4 +68,4 @@ def scrap_connections(flights_resp_dal):
 
 
 if __name__ == "__main__":
-    scrap_connections()
+    scrap_connections(FlightChecker().pricer.flights_provider.flights_resp_dal)

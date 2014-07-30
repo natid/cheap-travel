@@ -41,6 +41,7 @@ class VayantConnector(object):
 
 
     def get_flights_info(self, trip):
+        resp = None
         key = self._create_cache_key_from_trip(trip)
         #a = time.time()
         cached_resp = self.flights_resp_dal.get(key)
@@ -63,7 +64,7 @@ class VayantConnector(object):
             resp = self._decompress_and_extract_json(response)
 
             if resp.has_key('Response') and resp['Response'] == 'Error':
-                print "ERROR!!! flight info: {}->{}".format(trip["Origin"][0], trip["Destination"][0]) + resp['Message']
+                #print "ERROR!!! flight info: {}->{}".format(trip["Origin"][0], trip["Destination"][0]) + resp['Message']
                 #print json.dumps(trip)
                 self.flights_resp_dal.remove(key)
                 return None
@@ -122,18 +123,18 @@ class VayantConnector(object):
             self.print_single_flight(flight[0])
 
     def print_single_flight(self, flight):
-        response = ""
-        response += flight["Fares"][0]["Origin"] + " -> " + flight["Fares"][0]["Destination"] + ":"
-        response += "total price = {}".format(flight['Price']['Total']['Amount'])
-        response += "flights details: "
+        response = "\n"
+        response += flight["Fares"][0]["Origin"] + " -> " + flight["Fares"][0]["Destination"] + ":\n"
+        response += "total price = {}".format(flight['Price']['Total']['Amount']) + "\n"
+        response += "flights details: "+ "\n"
         for leg in flight["Flights"]:
-            response += "\t" + leg["Origin"] + " -> " + leg["Destination"] + ":"
-            response += "\t departure: " + leg["Departure"]
-            response += "\t arrival: " + leg["Arrival"]
+            response += "\t" + leg["Origin"] + " -> " + leg["Destination"] + ":"+ "\n"
+            response += "\t departure: " + leg["Departure"]+ "\n"
+            response += "\t arrival: " + leg["Arrival"]+ "\n"
             if self.flights_resp_dal.get_airline(leg["OperatingCarrier"]) is not None:
-                response += "\t carrier: " + self.flights_resp_dal.get_airline(leg["OperatingCarrier"])
+                response += "\t carrier: " + self.flights_resp_dal.get_airline(leg["OperatingCarrier"])+ "\n"
             else:
-                response += "\t carrier: " + leg["OperatingCarrier"]
+                response += "\t carrier: " + leg["OperatingCarrier"]+ "\n"
         return response
 
     def get_first_flight_from_trip(self, trip_data):

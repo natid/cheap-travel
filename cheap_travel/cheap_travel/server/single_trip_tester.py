@@ -47,6 +47,10 @@ def get_single_check(origin, dest, depart_date, return_date, flight_checker):
     area = flight_checker.pricer.flights_provider.flights_resp_dal.get_area_code(origin, dest)
     connections_list = flight_checker.pricer.flights_provider.flights_resp_dal.get_connections_in_area(area)
 
+    if len(connections_list) == 0:
+        print "couldn't get connection list"
+        return None
+
     pool = ThreadPool(20, "flight_checker", FlightChecker)
 
     for single_connection in connections_list[0]:

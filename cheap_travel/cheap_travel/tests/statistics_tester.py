@@ -20,8 +20,8 @@ if __name__ == "__main__":
                 break
 
 
-    for test in tests_to_run:
-        print test
+    for index, test in enumerate(tests_to_run):
+        print test, index
         final_prices = get_single_check(*test, flight_checker=FlightChecker())
 
         round_trip_price, cheapest_trip_price, flight, cheapest_type = get_cheapest_flight(final_prices)
