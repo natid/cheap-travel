@@ -1,6 +1,10 @@
 from thread_pool import ThreadPool
 from flights_data.flight_checks import FlightChecker
 
+pool = ThreadPool(20, "flight_checker", FlightChecker)
+
+pool.start()
+
 def check_flights(origin, dest, connection, depart_date, return_date, flight_checker):
 
     prices = []
@@ -20,11 +24,20 @@ def get_dict_key(origin, dest, depart_date, return_date):
     return "%s-%s, %s, %s" % (origin, dest, depart_date, return_date)
 
 def get_cheapest_flight(final_prices):
+    found = False
     if final_prices:
-        assert("Round Trip" in final_prices[0][0][0])
-        round_trip_price = cheapest_trip_price = final_prices[0][0][1]
-        cheapest_flight = final_prices[0][0][2]
-        cheapest_type = final_prices[0][0][0]
+        for flight in final_prices[0]:
+            if "Round Trip" in flight[0]:
+                round_trip_price = cheapest_trip_price = flight[1]
+                cheapest_flight = flight[2]
+                cheapest_type = flight[0]
+                found  = True
+                break
+        if not found:
+            print "couldn't find round trip"
+            return None, None, None, None
+
+
         for options in final_prices:
             for price in options:
                 if price[1] < cheapest_trip_price:
@@ -51,13 +64,11 @@ def get_single_check(origin, dest, depart_date, return_date, flight_checker):
         print "couldn't get connection list"
         return None
 
-    pool = ThreadPool(20, "flight_checker", FlightChecker)
 
     for single_connection in connections_list[0]:
         if origin != dest != single_connection != origin:
             pool.add_task(check_flights, origin, dest, single_connection, depart_date, return_date)
 
-    pool.start()
     pool.wait_completion()
 
     final_prices = flight_checker.pricer.flights_provider.flights_resp_dal.get_results(dict_key)

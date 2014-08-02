@@ -19,11 +19,14 @@ if __name__ == "__main__":
                 print "Finished loading %d tests" % i
                 break
 
-
+    #first time only for it to be entered to the DB, the second is for actual analyzing
     for index, test in enumerate(tests_to_run):
         print test, index
         final_prices = get_single_check(*test, flight_checker=FlightChecker())
 
+    for index, test in enumerate(tests_to_run):
+        print test, index
+        final_prices = get_single_check(*test, flight_checker=FlightChecker())
         round_trip_price, cheapest_trip_price, flight, cheapest_type = get_cheapest_flight(final_prices)
         prices.append((round_trip_price, cheapest_trip_price))
 
