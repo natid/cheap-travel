@@ -18,7 +18,7 @@ if __name__ == "__main__":
             except EOFError:
                 print "Finished loading %d tests" % i
                 break
-
+    tests_to_run = tests_to_run[0:300]
     #first time only for it to be entered to the DB, the second is for actual analyzing
     for index, test in enumerate(tests_to_run):
         print test, index

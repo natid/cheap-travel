@@ -4,6 +4,7 @@ import hashlib
 from collections import defaultdict
 import time
 import zlib
+import constants
 
 from cheap_travel.db.flights_resp import FlightsRespDAL
 

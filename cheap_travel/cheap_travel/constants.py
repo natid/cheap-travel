@@ -1,4 +1,4 @@
-MAX_FLIGHTS_PER_TRIP = 30
+MAX_FLIGHTS_PER_TRIP = 20
 CONNECTION_DAYS = 4
 
 # areas are in form of ([left upper corner], [right upper corner], [left bottom corner], [right bottom corner]], area index)
