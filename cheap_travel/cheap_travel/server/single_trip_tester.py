@@ -15,28 +15,30 @@ def check_flights(origin, dest, connection, depart_date, return_date, flight_che
         if data:
             prices.append(data)
 
-    if prices:
-        dict_key = get_dict_key(origin, dest, depart_date, return_date)
-        flight_checker.pricer.flights_provider.flights_resp_dal.insert_results_to_db(dict_key, prices)
+    #if prices:
+    dict_key = get_dict_key(origin, dest, depart_date, return_date)
+    flight_checker.pricer.flights_provider.flights_resp_dal.insert_results_to_db(dict_key, prices)
 
 
 def get_dict_key(origin, dest, depart_date, return_date):
     return "%s-%s, %s, %s" % (origin, dest, depart_date, return_date)
 
+def _get_round_trip_prices(flights):
+    for flight in flights:
+        for price in flight:
+            if "Round Trip" in price[0]:
+                return True, price
+    return False, None
+
 def get_cheapest_flight(final_prices):
-    found = False
     if final_prices:
-        for flight in final_prices[0]:
-            if "Round Trip" in flight[0]:
-                round_trip_price = cheapest_trip_price = flight[1]
-                cheapest_flight = flight[2]
-                cheapest_type = flight[0]
-                found  = True
-                break
+        found, prices = _get_round_trip_prices(final_prices)
         if not found:
-            print "couldn't find round trip"
             return None, None, None, None
 
+        round_trip_price = cheapest_trip_price = prices[1]
+        cheapest_flight = prices[2]
+        cheapest_type = prices[0]
 
         for options in final_prices:
             for price in options:

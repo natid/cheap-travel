@@ -14,8 +14,8 @@ tests = []
 for index in xrange(0, TESTS_TO_CREATE):
     origin = airports[randint(0, len(airports)-1)]
     dest = airports[randint(0, len(airports)-1)]
-    departure_date = datetime.date(2014, 8, 02) + datetime.timedelta(days=randint(0,130))
-    return_date = departure_date+ datetime.timedelta(days=randint(0,40))
+    departure_date = datetime.date(2014, 8, 22) + datetime.timedelta(days=randint(0,130))
+    return_date = departure_date+ datetime.timedelta(days=randint(5,40))
 
     tests.append((origin, dest, departure_date, return_date))
 
