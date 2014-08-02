@@ -13,7 +13,7 @@ class Pricer(object):
         second_trip = self.flights_provider.build_trip(dest, origin, arrive_dates, 2)
         trip_data = self.flights_provider.get_flights_info([first_trip, second_trip])
 
-        if trip_data and trip_data.has_key("Journeys") and len(trip_data['Journeys']) > 0:
+        if trip_data and trip_data.has_key("Journeys") and trip_data['Journeys'] and len(trip_data['Journeys']) > 0:
             return self.flights_provider.extract_cheapest_price(trip_data), trip_data
 
         return (None, None)
