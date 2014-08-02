@@ -18,17 +18,25 @@ if __name__ == "__main__":
             except EOFError:
                 print "Finished loading %d tests" % i
                 break
-    tests_to_run = tests_to_run[0:300]
+
     #first time only for it to be entered to the DB, the second is for actual analyzing
+    tests_to_run = tests_to_run[0:300]
     for index, test in enumerate(tests_to_run):
         print test, index
         final_prices = get_single_check(*test, flight_checker=FlightChecker())
+        if not final_prices:
+            tests_to_run.remove(test)
+
+    with open("updated_tests.info", "w") as tests_file:
+        for test in tests_to_run:
+            pickle.dump(test,tests_file)
 
     for index, test in enumerate(tests_to_run):
         print test, index
         final_prices = get_single_check(*test, flight_checker=FlightChecker())
         round_trip_price, cheapest_trip_price, flight, cheapest_type = get_cheapest_flight(final_prices)
-        prices.append((round_trip_price, cheapest_trip_price))
+        if round_trip_price and cheapest_trip_price:
+            prices.append((round_trip_price, cheapest_trip_price))
 
     total_precentage_saving = 0
     for price in prices:

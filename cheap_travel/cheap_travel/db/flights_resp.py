@@ -51,14 +51,17 @@ class FlightsRespDAL(object):
 
         new_dict = {}
         new_dict['key'] = key
-        new_dict['value'] = data["Journeys"][0:constants.MAX_FLIGHTS_PER_TRIP]
+        if data:
+            new_dict['value'] = data["Journeys"][0:constants.MAX_FLIGHTS_PER_TRIP]
+        else:
+            new_dict['value'] = data
         self.flights_collection.insert(new_dict)
 
 
     def get(self, key):
         data = self.flights_collection.find_one({"key": key})
         if data:
-            return data['value']
+            return {"Journeys" :data['value']}
         else:
             return
 
