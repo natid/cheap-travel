@@ -1,6 +1,6 @@
 from thread_pool import ThreadPool
 from db.flights_resp import FlightsRespDAL
-from flights_data.flight_checker import FlightChecker
+from flights_data.flight_checks import FlightChecker
 from datetime import date
 
 airports_error = []

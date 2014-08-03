@@ -1,5 +1,5 @@
 from thread_pool import ThreadPool
-from flights_data.flight_checker import FlightChecker
+from flights_data.flight_checks import FlightChecker
 
 pool = ThreadPool(20, "flight_checker", FlightChecker)
 

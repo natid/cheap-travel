@@ -1,7 +1,7 @@
 import pickle
 import datetime
 from server.single_trip_tester import get_single_check, get_cheapest_flight
-from flights_data.flight_checker import FlightChecker
+from flights_data.flight_checks import FlightChecker
 
 if __name__ == "__main__":
 

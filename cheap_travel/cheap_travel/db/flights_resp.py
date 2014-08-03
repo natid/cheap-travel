@@ -48,6 +48,9 @@ class FlightsRespDAL(object):
         else:
             return
 
+    def get_all_results(self):
+        return self.results_collection.find()
+
     def set(self, key, data):
         self.remove(key)
 
@@ -78,9 +81,6 @@ class FlightsRespDAL(object):
         if value:
             return (value['airport_name'], value['airport_country'])
         return None
-
-    def get_all_airports(self):
-        return self.airport_collection.find()
 
     def get_airline(self, code):
         value = self.airline_collection.find_one({"airline_code": code})

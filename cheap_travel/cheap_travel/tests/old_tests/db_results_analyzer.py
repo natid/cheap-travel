@@ -1,8 +1,8 @@
-from db.flights_resp import FlightsRespDAL
-from datetime import timedelta, time, date
-from flights_data.flight_checker import FlightChecker
 from pprint import pprint
-import tester
+
+from flights_data.flight_checks import FlightChecker
+from tests.old_tests import tester
+
 
 def check_single(origin, dest, depart_date, return_date):
 
