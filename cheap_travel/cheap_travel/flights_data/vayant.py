@@ -40,7 +40,7 @@ demo_request_json = {
 class VayantConnector(object):
     def __init__(self):
         self.flights_resp_dal = FlightsRespDAL()
-        self.pool = ThreadPool(1)
+        self.pool = ThreadPool(40)
         self.pool.start()
 
 
@@ -212,7 +212,7 @@ class VayantConnector(object):
 
     def do_after_done(self, resp):
         trip_data = resp
-        if trip_data and trip_data.has_key("Journeys") and len(trip_data['Journeys']) > 0:
+        if trip_data and trip_data.has_key("Journeys") and trip_data['Journeys'] and len(trip_data['Journeys']) > 0:
             return self.extract_cheapest_price(trip_data), trip_data
 
         return (None, None)

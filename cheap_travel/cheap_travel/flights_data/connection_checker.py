@@ -10,6 +10,9 @@ class ConnectionChecker(object):
         self.flights_resp_dal = FlightsRespDAL()
         self.resp_collector = ResponseCollector()
 
+    def get_dict_key(self, origin, dest, depart_date, return_date):
+        return "%s-%s, %s, %s" % (origin, dest, depart_date, return_date)
+
     def run_connection_check_async(self, origin, dest, depart_date, return_date):
         area = self.flights_resp_dal.get_area_code(origin, dest)
         connections_list = self.flights_resp_dal.get_connections_in_area(area)
@@ -17,7 +20,6 @@ class ConnectionChecker(object):
         if len(connections_list) == 0:
             print "couldn't get connection list"
             return None
-
 
         for single_connection in connections_list[0]:
             if origin != dest != single_connection != origin:
@@ -27,6 +29,16 @@ class ConnectionChecker(object):
         return AsyncMultiResponse(self.resp_collector)
 
     def run_connection_check(self, origin, dest, depart_date, return_date):
-        async_resp = self.run_connection_check_async(origin, dest, depart_date, return_date)
-        return async_resp.get_response()
+        dict_key = self.get_dict_key(origin, dest, depart_date, return_date)
+        cached_result = self.flights_resp_dal.get_results(dict_key)
 
+        if cached_result:
+            return cached_result
+
+        async_resp = self.run_connection_check_async(origin, dest, depart_date, return_date)
+        res = async_resp.get_response()
+
+        dict_key = self.get_dict_key(origin, dest, depart_date, return_date)
+        self.flights_resp_dal.insert_results_to_db(dict_key, res)
+
+        return res

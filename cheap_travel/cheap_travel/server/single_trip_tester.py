@@ -2,6 +2,7 @@ from thread_pool import ThreadPool
 from flights_data.flight_checks import FlightChecker
 from flights_data.connection_checker import ConnectionChecker
 from flights_data.vayant import VayantConnector
+from datetime import datetime
 
 #pool = ThreadPool(20, "flight_checker", FlightChecker)
 
@@ -77,6 +78,9 @@ def get_single_check(origin, dest, depart_date, return_date, flight_checker):
 
     return final_prices
 
-def new_single_check(origin, dest, depart_date, return_date, flight_checker):
-    connection_checker = ConnectionChecker(VayantConnector())
+def new_single_check(origin, dest, depart_date, return_date, vayant_connector):
+    connection_checker = ConnectionChecker(vayant_connector)
     return connection_checker.run_connection_check(origin, dest, depart_date, return_date)
+
+# from pprint import pprint
+# pprint(new_single_check("TLV", "BKK", datetime(2014, 8, 12), datetime(2014, 8, 23), None))

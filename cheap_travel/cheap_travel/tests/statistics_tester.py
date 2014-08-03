@@ -1,12 +1,14 @@
 import pickle
 import datetime
-from server.single_trip_tester import get_single_check, get_cheapest_flight
+from server.single_trip_tester import new_single_check, get_cheapest_flight
 from flights_data.flight_checks import FlightChecker
+from flights_data.vayant import VayantConnector
 
 if __name__ == "__main__":
 
     tests_to_run = []
     prices = []
+    vayant_connector = VayantConnector()
 
     i=0
     with open("tests.info", "rU") as tests_file:
@@ -20,10 +22,10 @@ if __name__ == "__main__":
                 break
 
     #first time only for it to be entered to the DB, the second is for actual analyzing
-    tests_to_run = tests_to_run[0:300]
+    #tests_to_run = tests_to_run[0:300]
     for index, test in enumerate(tests_to_run):
         print test, index
-        final_prices = get_single_check(*test, flight_checker=FlightChecker())
+        final_prices = new_single_check(*test, vayant_connector = vayant_connector)
         if not final_prices:
             tests_to_run.remove(test)
 
@@ -33,7 +35,7 @@ if __name__ == "__main__":
 
     for index, test in enumerate(tests_to_run):
         print test, index
-        final_prices = get_single_check(*test, flight_checker=FlightChecker())
+        final_prices = new_single_check(*test, flight_checker=FlightChecker())
         round_trip_price, cheapest_trip_price, flight, cheapest_type = get_cheapest_flight(final_prices)
         if round_trip_price and cheapest_trip_price:
             prices.append((round_trip_price, cheapest_trip_price))

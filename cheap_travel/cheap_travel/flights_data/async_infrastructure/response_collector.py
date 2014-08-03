@@ -42,11 +42,12 @@ class ResponseCollector(object):
         return is_done
 
     def _unpack_responses(self):
-        for key in self.parameter_dict.keys():
+        for key in self.resp_dict.keys():
             self.resp_dict[key] = self.resp_dict[key].get_response()
 
 
     def get_response(self):
+        self._unpack_responses()
         return self.resp_dict
 
 

@@ -118,7 +118,7 @@ class FlightChecker(object):
                                                                                                     trip_data2, connection1)
                 if price1 and price2:
                     return ("Connection in beginning in {} at {}".format(connection1,
-                                                                         self.pricer.flights_provider.get_departure_flight_date(
+                                                                         self.pricer.get_departure_flight_date(
                                                                              trip_data2)), price1 + price2 + price3,
                             [trip_data1, trip_data2, trip_data3] )
             return None
@@ -147,7 +147,7 @@ class FlightChecker(object):
                                                                                                     trip_data3, connection1)
                 if price2 and price3:
                     return ("Connection in the end in {} at {}".format(connection1,
-                                                                       self.pricer.flights_provider.get_departure_flight_date(
+                                                                       self.pricer.get_departure_flight_date(
                                                                            trip_data2)), price1 + price2 + price3,
                             [trip_data1, trip_data2, trip_data3] )
             return None
@@ -174,7 +174,7 @@ class FlightChecker(object):
                                                                                                     trip_data2, connection1)
                 if price1 and price2:
                     return ("Two Connections stay in the beginning in {} at {}".format(connection1,
-                                                                                       self.pricer.flights_provider.get_departure_flight_date(
+                                                                                       self.pricer.get_departure_flight_date(
                                                                                            trip_data2)), price1 + price2,
                             [trip_data1, trip_data2]  )
 
@@ -201,7 +201,7 @@ class FlightChecker(object):
                                                                                                     trip_data2, connection1)
                 if price1 and price2:
                     return ("Two Connections stay in the end in {} at {}".format(connection1,
-                                                                                 self.pricer.flights_provider.get_return_flight_date(
+                                                                                 self.pricer.get_return_flight_date(
                                                                                      trip_data1)), price1 + price2,
                             [trip_data1, trip_data2] )
             return None
@@ -214,7 +214,7 @@ class FlightChecker(object):
         return date.strftime("%Y-%m-%d")
 
     def get_cheapest_flights_that_can_connect(self, is_one_way_flights, trip1, trip2, connection):
-        provider = self.pricer.flights_provider
+        provider = self.pricer
         # return self.pricer.flights_provider.extract_cheapest_price(trip1), trip1['Journeys'][0][0], \
         #        self.pricer.flights_provider.extract_cheapest_price(trip2), trip2['Journeys'][0][0]
 
