@@ -1,6 +1,8 @@
 from pymongo import MongoClient
 import constants
 from shapely.geometry import Polygon, Point
+
+
 class FlightsRespDAL(object):
 
     def __init__(self):

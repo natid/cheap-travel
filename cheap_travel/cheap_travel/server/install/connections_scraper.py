@@ -1,6 +1,6 @@
 from thread_pool import ThreadPool
 from random import randint
-from flights_data.flight_checks import FlightChecker
+from flights_data.flight_checker import FlightChecker
 from datetime import timedelta
 import datetime
 import csv

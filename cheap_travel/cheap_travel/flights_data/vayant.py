@@ -7,7 +7,8 @@ import zlib
 import constants
 
 from cheap_travel.db.flights_resp import FlightsRespDAL
-
+from thread_pool import ThreadPool
+from async_infrastructure.async_response import AsyncResponse
 
 trips_cache = defaultdict()
 
@@ -39,17 +40,32 @@ demo_request_json = {
 class VayantConnector(object):
     def __init__(self):
         self.flights_resp_dal = FlightsRespDAL()
+        self.pool = ThreadPool(20)
+        self.pool.start()
 
 
-    def get_flights_info(self, trip):
-        resp = None
-        key = self._create_cache_key_from_trip(trip)
-        #a = time.time()
+    def get_flight_price_async(self, trip):
+        response = AsyncResponse(self.do_after_done)
+        self.pool.add_task(self.calculate_flight_info, trip, response)
+        return response
+
+    def get_flight_from_cache(self, key):
+
         cached_resp = self.flights_resp_dal.get(key)
-        #print "Query time is {} size is {}".format(time.time() - a, sys.getsizeof
         while self.flights_resp_dal.has_key(key) and cached_resp is None:
             time.sleep(5)
             cached_resp = self.flights_resp_dal.get(key)
+        return cached_resp
+
+    def calculate_flight_info(self, trip, response):
+        resp = self.get_flights_info(trip)
+        response.set_response_value(resp)
+
+    def get_flights_info(self, trip):
+        resp = None
+
+        key = self._create_cache_key_from_trip(trip)
+        cached_resp = self.get_flight_from_cache(key)
         if cached_resp:
             return cached_resp
 
@@ -181,4 +197,24 @@ class VayantConnector(object):
                 return trip['Flights'][i], trip['Flights'][i + 1]
 
         return None, None
+
+    def get_price_round_trip(self, origin, dest, depart_dates, arrive_dates, get_full_response = False):
+        first_trip = self.build_trip(origin, dest, depart_dates, 1)
+        second_trip = self.build_trip(dest, origin, arrive_dates, 2)
+        return self.get_flight_price_async([first_trip, second_trip])
+
+
+
+    def get_price_one_way(self, origin, dest, depart_dates):
+        first_trip = self.build_trip(origin, dest, depart_dates, 1)
+        return self.get_flight_price_async([first_trip])
+
+
+    def do_after_done(self, resp):
+        trip_data = resp
+        if trip_data and trip_data.has_key("Journeys") and len(trip_data['Journeys']) > 0:
+            return self.extract_cheapest_price(trip_data), trip_data
+
+        return (None, None)
+
 

@@ -2,7 +2,7 @@ from flask import Flask
 from flask import request
 import time
 import thread
-from flights_data.flight_checks import FlightChecker
+from flights_data.flight_checker import FlightChecker
 import datetime
 
 import single_trip_tester

@@ -1,6 +1,6 @@
 from db.flights_resp import FlightsRespDAL
 from datetime import timedelta, time, date
-from flights_data.flight_checks import FlightChecker
+from flights_data.flight_checker import FlightChecker
 from pprint import pprint
 import tester
 

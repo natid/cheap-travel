@@ -1,5 +1,5 @@
 from datetime import date, timedelta
-from flights_data.flight_checks import FlightChecker
+from flights_data.flight_checker import FlightChecker
 from thread_pool import ThreadPool
 from flights_data.pricer import Pricer
 
