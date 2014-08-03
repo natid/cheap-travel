@@ -1,9 +1,11 @@
 from thread_pool import ThreadPool
 from flights_data.flight_checks import FlightChecker
+from flights_data.connection_checker import ConnectionChecker
+from flights_data.vayant import VayantConnector
 
-pool = ThreadPool(20, "flight_checker", FlightChecker)
+#pool = ThreadPool(20, "flight_checker", FlightChecker)
 
-pool.start()
+#pool.start()
 
 def check_flights(origin, dest, connection, depart_date, return_date, flight_checker):
 
@@ -67,10 +69,14 @@ def get_single_check(origin, dest, depart_date, return_date, flight_checker):
 
     for single_connection in connections_list[0]:
         if origin != dest != single_connection != origin:
-            pool.add_task(check_flights, origin, dest, single_connection, depart_date, return_date)
+            pass#pool.add_task(check_flights, origin, dest, single_connection, depart_date, return_date)
 
-    pool.wait_completion()
+    #pool.wait_completion()
 
     final_prices = flight_checker.pricer.flights_provider.flights_resp_dal.get_results(dict_key)
 
     return final_prices
+
+def new_single_check(origin, dest, depart_date, return_date, flight_checker):
+    connection_checker = ConnectionChecker(VayantConnector())
+    return connection_checker.run_connection_check(origin, dest, depart_date, return_date)

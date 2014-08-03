@@ -1,4 +1,3 @@
-from response_collector import ResponseCollector
 import time
 
 
@@ -37,9 +36,9 @@ class AsyncResponse(object):
         self.response_value = resp
 
 
-def AsyncMultiResponse(AsyncResponse):
+class AsyncMultiResponse(AsyncResponse):
     def __init__(self, resp_collector, do_after_done=None):
-        super(AsyncResponse, self).__init__(do_after_done)
+        super(AsyncMultiResponse, self).__init__(do_after_done)
         self.resp_collector = resp_collector
 
     def _calculate_if_done(self):
@@ -47,7 +46,7 @@ def AsyncMultiResponse(AsyncResponse):
             self.done = True
 
     def _calculate_response(self):
-        resp = self.resp_collector.get_respnse()
+        resp = self.resp_collector.get_response()
         if self.do_after_done:
             resp = self.do_after_done(resp)
 

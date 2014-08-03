@@ -22,7 +22,7 @@ class ResponseData(object):
 class ResponseCollector(object):
 
     def __init__(self):
-        self.resp_list = {}
+        self.resp_dict = {}
 
     def add_response(self, key, parameter, resp, do_after_done=None):
         if not self.resp_dict.has_key(key):
@@ -35,7 +35,7 @@ class ResponseCollector(object):
         is_done = True
 
         for responses in self.resp_dict.values():
-            for resp in responses:
+            for resp in responses.parameter_dict.values():
                 if type(resp) is AsyncResponse and not resp.is_done():
                     is_done = False
 

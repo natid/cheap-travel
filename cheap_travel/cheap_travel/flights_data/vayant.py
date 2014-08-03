@@ -40,7 +40,7 @@ demo_request_json = {
 class VayantConnector(object):
     def __init__(self):
         self.flights_resp_dal = FlightsRespDAL()
-        self.pool = ThreadPool(20)
+        self.pool = ThreadPool(1)
         self.pool.start()
 
 

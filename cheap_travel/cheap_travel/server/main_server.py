@@ -61,14 +61,17 @@ def run_single_request(origin, destination, departure_date, return_date):
     global result_for_user
 
     start_time = time.time()
-    flight_checker = FlightChecker()
+    #flight_checker = FlightChecker()
 
     response = ""
-    final_prices = single_trip_tester.get_single_check(origin,
+    final_prices = single_trip_tester.new_single_check(origin,
                                                        destination,
                                                        datetime.datetime.strptime(departure_date, "%Y-%m-%d"),
                                                        datetime.datetime.strptime(return_date, "%Y-%m-%d"),
-                                                       flight_checker)
+                                                       None)
+
+    print final_prices
+    exit()
 
     round_trip_price, cheapest_price, cheapest_flight, cheapest_type = single_trip_tester.get_cheapest_flight(final_prices)
     response += "round trip price = {}, cheapest price = {} , cheapest type = {} , flights information is: \n".format(round_trip_price, cheapest_price, cheapest_type)

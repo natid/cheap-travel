@@ -24,8 +24,9 @@ class Worker(Thread):
     def run(self):
         while True:
             func, task_number, args, kargs = self.tasks.get()
-            kargs[self.added_name] = self.added_instance
-            #print "worker number {0} going to do task number {1}".format(self.worker_number, task_number)
+            if hasattr(self, "added_name"):
+                kargs[self.added_name] = self.added_instance
+            print "worker number {0} going to do task number {1}".format(self.worker_number, task_number)
             duration = 0
             try:
                 start_time = time.time()
