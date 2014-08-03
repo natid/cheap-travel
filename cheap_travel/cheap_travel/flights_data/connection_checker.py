@@ -1,10 +1,11 @@
 from flights_data.async_infrastructure.async_response import AsyncMultiResponse
 from flights_data.async_infrastructure.response_collector import ResponseCollector
-import time
+from flights_data.flight_checks import FlightChecker
+
 
 class ConnectionChecker(object):
-    def __init__(self, flight_checker, flights_resp_dal):
-        self.flight_checker = flight_checker
+    def __init__(self, vayant_connector, flights_resp_dal):
+        self.flight_checker = FlightChecker(vayant_connector)
         self.flights_resp_dal = flights_resp_dal
         self.resp_collector = ResponseCollector()
 
