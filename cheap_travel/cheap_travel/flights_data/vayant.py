@@ -40,7 +40,7 @@ demo_request_json = {
 class VayantConnector(object):
     def __init__(self):
         self.flights_resp_dal = FlightsRespDAL()
-        self.pool = ThreadPool(40)
+        self.pool = ThreadPool(30)
         self.pool.start()
 
 
@@ -192,7 +192,7 @@ class VayantConnector(object):
         return 99999
 
     def get_dest_flights_in_two_way(self, trip, connection):
-        for i in xrange(len(trip['Flights'])):
+        for i in xrange(len(trip['Flights'])-1):
             if trip['Flights'][i]['Destination'] == connection:
                 return trip['Flights'][i], trip['Flights'][i + 1]
 

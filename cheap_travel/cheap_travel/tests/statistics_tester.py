@@ -11,7 +11,7 @@ if __name__ == "__main__":
     vayant_connector = VayantConnector()
 
     i=0
-    with open("tests.info", "rU") as tests_file:
+    with open("top_100_tests.info", "rU") as tests_file:
         while True:
             try:
                 test = pickle.load(tests_file)

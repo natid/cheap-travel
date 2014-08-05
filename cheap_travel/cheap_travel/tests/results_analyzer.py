@@ -9,7 +9,6 @@ def get_chepaset_prices(results):
     prices = []
 
     for index, result in enumerate(results):
-        if index <307: continue
         final_prices = result["connections"]
         round_trip_price, cheapest_trip_price, cheapest_flight, cheapest_type = get_cheapest_flight(final_prices)
         #get_cheapest_flight only returns values if there was a round trip price
