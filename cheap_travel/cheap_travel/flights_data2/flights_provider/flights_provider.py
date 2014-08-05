@@ -5,7 +5,8 @@ class BaseFlightsProvider(object):
     def __init__(self, flights_resp_dal):
         self.flights_resp_dal = flights_resp_dal
 
-    def search_flight_async(self, key, trip_data):
+    def search_flight_async(self, trip_data):
+        key = trip_data.compute_key()
         cached_resp = self.get_flight_from_cache(key)
         if cached_resp:
             return cached_resp
