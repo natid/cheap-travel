@@ -82,5 +82,8 @@ def new_single_check(origin, dest, depart_date, return_date, vayant_connector):
     connection_checker = ConnectionChecker(vayant_connector)
     return connection_checker.run_connection_check(origin, dest, depart_date, return_date)
 
+# from flights_data.flight_checks import FlightChecker
+# import time
 # from pprint import pprint
-# pprint(new_single_check("TLV", "BKK", datetime(2014, 8, 12), datetime(2014, 8, 23), None))
+# pprint(FlightChecker(VayantConnector()).check_round_trip("TLV", "BKK", datetime(2014, 8, 12), datetime(2014, 8, 23), None, None, None))
+# time.sleep(3000)

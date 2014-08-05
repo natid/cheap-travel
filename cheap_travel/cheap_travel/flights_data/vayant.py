@@ -4,11 +4,11 @@ import hashlib
 from collections import defaultdict
 import time
 import zlib
-import constants
 
 from cheap_travel.db.flights_resp import FlightsRespDAL
 from thread_pool import ThreadPool
 from async_infrastructure.async_response import AsyncResponse
+from trip_data import Trip, Flight
 
 trips_cache = defaultdict()
 
@@ -80,13 +80,12 @@ class VayantConnector(object):
             response = urllib2.urlopen(req)
             resp = self._decompress_and_extract_json(response)
 
-            if resp.has_key('Response') and resp['Response'] == 'Error':
-                #print "ERROR!!! flight info: {}->{}".format(trip["Origin"][0], trip["Destination"][0]) + resp['Message']
-                #print json.dumps(trip)
+            trip = self._get_flights_from_vayant_response(response)
+            if trip:
                 self.flights_resp_dal.remove(key)
                 return None
 
-            self.flights_resp_dal.set(key, resp)
+            self.flights_resp_dal.set(key, trip)
         finally:
             if not resp:
                 self.flights_resp_dal.remove(key)
@@ -134,10 +133,6 @@ class VayantConnector(object):
             assert False, "wrong dates type"
 
         return trip
-
-    def print_trip(self, trip, num_flights):
-        for flight in trip['Journeys'][0:num_flights]:
-            self.print_single_flight(flight[0])
 
     def print_single_flight(self, flight):
         response = "\n"
@@ -216,5 +211,32 @@ class VayantConnector(object):
             return self.extract_cheapest_price(trip_data), trip_data
 
         return (None, None)
+
+
+
+    def _get_flights_from_vayant_response(self, response):
+        if response.has_key('Response') and response['Response'] == 'Error':
+            #print "ERROR!!! flight info: {}->{}".format(trip["Origin"][0], trip["Destination"][0]) + resp['Message']
+            #print json.dumps(trip)
+            return None
+
+        trips = []
+        for single_vayant_response in response["Journeys"]:
+            price = single_vayant_response[0]["Price"]["Total"]["Amount"]
+            legs = []
+            for single_leg in single_vayant_response[0]["Flights"]:
+                origin = single_leg["Origin"]
+                dest = single_leg["Destination"]
+                carrier = single_leg["OperatingCarrier"]
+                flight_number = single_leg["FlightNumber"]
+                departure = single_leg["Departure"]
+                arrival = single_leg["Arrival"]
+                leg = Flight(origin, dest, carrier, flight_number, departure, arrival)
+                legs.append(leg)
+
+            trip = Trip(price, legs)
+            trips.append(trip)
+        return trips
+
 
 
