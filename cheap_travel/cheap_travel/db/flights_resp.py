@@ -54,24 +54,17 @@ class FlightsRespDAL(object):
     def set(self, key, data):
         self.remove(key)
 
-        new_dict = {}
+        new_dict = dict()
         new_dict['key'] = key
-        if data:
-            new_dict['value'] = data["Journeys"][0:constants.MAX_FLIGHTS_PER_TRIP]
-        else:
-            new_dict['value'] = data
+        new_dict['value'] = data
         self.flights_collection.insert(new_dict)
 
 
     def get(self, key):
-        data = self.flights_collection.find_one({"key": key})
-        if data:
-            return {"Journeys" :data['value']}
-        else:
-            return
+        return self.flights_collection.find_one({"key": key})
 
     def has_key(self, key):
-        return self.flights_collection.find_one({"key": key}, fields= { 'Journeys' : { "$slice": 1 }}) is not None
+        return self.flights_collection.find_one({"key": key}) is not None
 
     def remove(self, key):
         self.flights_collection.remove({"key": key})
