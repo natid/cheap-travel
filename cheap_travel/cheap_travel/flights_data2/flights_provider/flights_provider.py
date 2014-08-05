@@ -5,7 +5,7 @@ class BaseFlightsProvider(object):
     def __init__(self, flights_resp_dal):
         self.flights_resp_dal = flights_resp_dal
 
-    def search_flight_async(self, key, trip_data):
+    def search_flight(self, key, trip_data):
         cached_resp = self.get_flight_from_cache(key)
         if cached_resp:
             return cached_resp
@@ -22,16 +22,7 @@ class BaseFlightsProvider(object):
 
         data_to_save = self.convert_provider_response(flight_data)
         self.save_flight_to_db(key, data_to_save)
-
-    def search_flight(self, trip_data):
-        try:
-            flight_data = self.call_provider(self.build_trip_request(trip_data))
-            if not flight_data:
-                return
-        except Exception:
-            return
-
-        return self.convert_provider_response(flight_data)
+        return cached_resp
 
     def get_flight_from_cache(self, key):
         cached_resp = self.flights_resp_dal.get(key)
