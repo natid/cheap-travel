@@ -97,7 +97,7 @@ class FlightsRespDAL(object):
     def get_connections_in_area(self, area):
         data = self.connections_collection.find_one({"area": area})
         if data:
-            return data["connections"]
+            return data["connections"][0]
         else:
             return
 
