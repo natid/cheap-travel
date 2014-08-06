@@ -2,7 +2,6 @@ from datetime import timedelta
 from flights_data2.connection_flight_checks.base_flight_type import BaseFlightType
 from flights_data2.constants import CONNECTION_DAYS
 
-
 class RoundTripFlightType(BaseFlightType):
 
     def calculate_relevant_flights(self):
