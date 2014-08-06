@@ -1,7 +1,11 @@
 from collections import defaultdict
+from threading import Thread
 from flights_data2.connection_flight_checks.connection_flight_types import ConnectionFlightTypes
-from flights_data2.thread_pool2 import ThreadPool
+from flights_data2.connection_flight_checks.flight_types import TwoOneWaysFlightType, RoundTripFlightType
+from flights_data2.observer import Observable
+import time
 
+CONNECTION_KEY_SEPERATOR = "$"
 
 class FlightPricesData(object):
 
@@ -22,9 +26,9 @@ class FlightPricesData(object):
         return self.cheapest_price
 
 
-class FlightSearchManager(object):
+class FlightSearchManager(Observable):
 
-    def __init__(self, trip_data, flight_provider, flights_resp_dal):
+    def __init__(self, trip_data, flight_provider, flights_resp_dal, thread_pool):
         self.trip_data = trip_data
         self.origin = trip_data['origin']
         self.dest = trip_data['dest']
@@ -33,10 +37,13 @@ class FlightSearchManager(object):
         self.flights_resp_dal = flights_resp_dal
         self.flight_provider = flight_provider
         self.flights_prices_data = defaultdict(dict)
-        self.pool = ThreadPool(20)
+        self.pool = thread_pool
+        self.connection_flight_data = {}
+        self.unfinished_requests = []
+        self.cheapest_flight = None
 
 
-    def search_flight(self):
+    def search_all_flight_combinations(self):
         area = self.flights_resp_dal.get_area_code(self.origin, self.dest)
         connections_list = self.flights_resp_dal.get_connections_in_area(area)
 
@@ -44,8 +51,40 @@ class FlightSearchManager(object):
             print "couldn't get connection list"
             return None
 
+        self.search_base_trips_flight()
         self.send_requests_to_flight_provider(connections_list)
+        self.updtae_responses()
+        self.notify_observers(finished=True)
 
+
+    def search_base_trips_flight(self):
+        t_round_trip = Thread(target=self.search_round_trip)
+        t_round_trip.start()
+
+        t_two_one_ways = Thread(target=self.search_two_one_ways)
+        t_two_one_ways.start()
+
+    def search_round_trip(self):
+        self.round_trip_flight = RoundTripFlightType(self.trip_data)
+        response = self.flight_provider.search_flight(self.trip_data)
+
+        if response:
+            self.round_trip_flight.set_response(response)
+            self.notify_if_cheaper(self.round_trip_flight)
+
+    def search_two_one_ways(self):
+        two_one_ways_trip_flight = TwoOneWaysFlightType(self.trip_data)
+        response = self.flight_provider.search_flight(self.trip_data)
+
+        if response:
+            two_one_ways_trip_flight.set_response(response)
+            self.notify_if_cheaper(self.round_trip_flight)
+
+    def notify_if_cheaper(self, flight_type):
+        price = flight_type.flight_response.price
+        if price < self.cheapest_flight.flight_response.get_final_price() or self.cheapest_flight is None:
+            self.cheapest_flight = flight_type
+            self.notify_observers()
 
     def build_flights_prices_data(self ,connections_list):
         for single_connection in connections_list:
@@ -54,29 +93,38 @@ class FlightSearchManager(object):
 
     def send_requests_to_flight_provider(self, connections_list):
         for single_connection in connections_list:
-            connectionFlightData = ConnectionFlightTypes(self.trip_data, single_connection)
-            trips_data = connectionFlightData.get_flights_for_connection()
-            for trip_data in trips_data:
+            connection_flight_types = ConnectionFlightTypes(self.trip_data, single_connection)
+            trips_data_and_flight_types = connection_flight_types.get_flights_for_connection()
+            for trip_data, flight_type in trips_data_and_flight_types:
                 self.pool.add_task(self.flight_provider.search_flight, trip_data)
-            # TODO build data structure
+                key = CONNECTION_KEY_SEPERATOR.join(single_connection, trip_data.compute_key())
+                self.connection_flight_data[key] = flight_type
 
-
-
-    '''
-    def later(self):
-        for single_connection in connections_list:
-            if origin != dest != single_connection != origin:
-                async_response = self.flight_checker.run_test_list(origin, dest, depart_date, return_date, single_connection, None)
-                self.resp_collector.add_response(single_connection, "first", async_response)
-    '''
     def get_flight_provider_request_list(self, connection):
         return [
                     (self.origin, self.dest, self.depart_date, self.return_date), # roundtrip
                     (self.origin, self.dest, self.depart_date), # two one ways
                     (self.dest, self.dest, self.depart_date), # two one ways
 
-
         ]
 
-    def get_roundtrip_requests():
+    def updtae_responses(self):
+        self.unfinished_requests = self.connection_flight_data.keys()
+        while self.unfinished_requests:
+            for request in self.unfinished_requests[:]:
+                connection, trip_key = request.split(CONNECTION_KEY_SEPERATOR)
+                response = self.flights_resp_dal.get(trip_key)
+                self.unfinished_requests.remove(request)
+                if response:
+                    self.connection_flight_data[request].set_response(response)
+                    self.notify_if_cheaper(self.connection_flight_data[request])
+
+            time.sleep(1)
+
+
+    def get_cheapest_flight(self):
+        return self.cheapest_flight
+
+    def is_finished(self):
+        return bool(self.unfinished_requests)
 
