@@ -5,7 +5,6 @@ from datetime import timedelta
 import datetime
 import csv
 
-
 def get_connections(origin, dest, date, flight_checker):
 
     go_trip_data = flight_checker.pricer.get_price_one_way(origin, dest, date)[1]
