@@ -81,9 +81,10 @@ class FlightSearchManager(Observable):
             self.notify_if_cheaper(self.round_trip_flight)
 
     def notify_if_cheaper(self, flight_type):
-        price = flight_type.flight_response.price
-        if price < self.cheapest_flight.flight_response.get_final_price() or self.cheapest_flight is None:
-            self.cheapest_flight = flight_type
+        updated_flight_data = flight_type.get_final_price()
+        cheapest_flight_data = self.cheapest_flight.get_final_price()
+        if updated_flight_data[0] < cheapest_flight_data[0] or self.cheapest_flight is None:
+            self.cheapest_flight = cheapest_flight_data
             self.notify_observers()
 
     def build_flights_prices_data(self ,connections_list):
