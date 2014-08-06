@@ -32,7 +32,7 @@ class FlightChecker(object):
         def do_after_done(resp):
             price1, trip_data1 = resp['first']
             if price1:
-                price1, trip_data1 = self.get_cheapest_flight_and_price(trip_data1)
+                price1, trip_data1 = self.get_cheapest_flights_that_can_connect(trip_data1)
                 return ("Round Trip", price1, [trip_data1])
             else:
                 return None

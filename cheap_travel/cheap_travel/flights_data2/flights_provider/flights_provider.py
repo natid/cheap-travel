@@ -15,10 +15,10 @@ class BaseFlightsProvider(object):
             self.flights_resp_dal.set(key, None)
             flight_data = self.call_provider(self.build_trip(trip_data))
             if not flight_data:
-                self.flights_resp_dal.remove(key)
+                self.flights_resp_dal.set(key, "No Result")
                 return
         except Exception:
-            self.flights_resp_dal.remove(key)
+            self.flights_resp_dal.set(key, "No Result")
             return
 
         data_to_save = self.convert_provider_response(flight_data)
