@@ -21,7 +21,6 @@ def get_area(flights_resp_dal, origin, dest):
 
 def scrap_connections(flights_resp_dal):
     areas=set()
-    nir = []
     airports = []
     with open('csv_files/top_100_airports.csv', 'rb') as csvfile:
         reader = csv.reader(csvfile)
