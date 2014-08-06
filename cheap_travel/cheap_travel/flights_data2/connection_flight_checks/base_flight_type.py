@@ -5,13 +5,13 @@ class BaseFlightType(object):
 
     # These are the 3 functions that the inheriting class should implement
     def calculate_relevant_flights(self):
-        assert(True, "shouldn't be called")
+        raise NotImplemented
 
     def get_final_price(self):
-        assert(True, "shouldn't be called")
+        raise NotImplemented
 
     def get_flight_type_str(self):
-        assert(True, "shouldn't be called")
+        raise NotImplemented
 
     def __init__(self, original_trip_data, connection=None):
         self.original_trip_data = original_trip_data
