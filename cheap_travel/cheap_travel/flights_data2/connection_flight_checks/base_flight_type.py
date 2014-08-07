@@ -1,6 +1,5 @@
 from flights_data2.trip_data import TripDataRequest, TripDataResponse
-import constants
-
+from constants import ERROR_RESPONSE, MAX_FLIGHTS_PER_TRIP
 class BaseFlightType(object):
 
     # These are the 3 functions that the inheriting class should implement
@@ -27,10 +26,13 @@ class BaseFlightType(object):
         self.calculate_relevant_flights()
 
     def get_trip_data_response(self, name):
-        return self.relevant_responses[self.name_to_key[name]]
+        if self.name_to_key[name] in self.relevant_responses.keys():
+            return self.relevant_responses[self.name_to_key[name]]
+        return None
 
     def set_trip_data_response(self, key, trip_data_response):
-        self.relevant_responses[key] = TripDataResponse(trip_data_response)
+        if trip_data_response and trip_data_response != ERROR_RESPONSE:
+            self.relevant_responses[key] = TripDataResponse(trip_data_response)
 
     def get_trip_data_requests(self):
         return self.relevant_requests
@@ -70,8 +72,8 @@ class BaseFlightType(object):
 
         first_index, second_index, first_base_index, second_base_index = cookie
 
-        if first_index == constants.MAX_FLIGHTS_PER_TRIP - 1:
-            if second_index == constants.MAX_FLIGHTS_PER_TRIP - 1:
+        if first_index == MAX_FLIGHTS_PER_TRIP - 1:
+            if second_index == MAX_FLIGHTS_PER_TRIP - 1:
                 return False, None, None, None, None
             update_second = True
 

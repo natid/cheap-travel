@@ -4,6 +4,7 @@ from flights_data2.connection_flight_checks.connection_flight_types import Conne
 from flights_data2.connection_flight_checks.flight_types import TwoOneWaysFlightType, RoundTripFlightType
 from flights_data2.observer import Observable
 import time
+from constants import PENDING
 
 CONNECTION_KEY_SEPERATOR = "$"
 
@@ -125,8 +126,8 @@ class FlightSearchManager(Observable):
             for request in self.unfinished_requests[:]:
                 connection, trip_key = request.split(CONNECTION_KEY_SEPERATOR)
                 response = self.flights_resp_dal.get(trip_key)
-                self.unfinished_requests.remove(request)
-                if response:
+                if response and response != PENDING:
+                    self.unfinished_requests.remove(request)
                     self.connection_flight_data[request].set_trip_data_response(trip_key, response)
                     self.notify_if_cheaper(self.connection_flight_data[request])
 

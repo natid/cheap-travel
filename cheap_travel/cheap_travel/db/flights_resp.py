@@ -61,7 +61,10 @@ class FlightsRespDAL(object):
 
 
     def get(self, key):
-        return self.flights_collection.find_one({"key": key})
+        db_value = self.flights_collection.find_one({"key": key})
+        if db_value:
+            return db_value["value"]
+        return None
 
     def has_key(self, key):
         return self.flights_collection.find_one({"key": key}) is not None

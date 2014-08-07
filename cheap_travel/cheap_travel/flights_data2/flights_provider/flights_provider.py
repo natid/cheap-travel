@@ -1,4 +1,5 @@
 import time
+from constants import PENDING, ERROR_RESPONSE
 
 class BaseFlightsProvider(object):
     
@@ -12,13 +13,13 @@ class BaseFlightsProvider(object):
             return cached_resp
 
         try:
-            self.flights_resp_dal.set(key, None)
+            self.flights_resp_dal.set(key, PENDING)
             flight_data = self.call_provider(self.build_trip(trip_data))
             if not flight_data:
-                self.flights_resp_dal.set(key, "No Result")
+                self.flights_resp_dal.set(key, ERROR_RESPONSE)
                 return
         except Exception:
-            self.flights_resp_dal.set(key, "No Result")
+            self.flights_resp_dal.set(key, ERROR_RESPONSE)
             return
 
         data_to_save = self.convert_provider_response(flight_data)
