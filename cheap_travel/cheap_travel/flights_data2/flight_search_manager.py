@@ -48,6 +48,7 @@ class FlightSearchManager(Observable):
 
     def search_all_flight_combinations(self):
         area = self.flights_resp_dal.get_area_code(self.origin, self.dest)
+        #TODO - don't forget to uncomment this after the connection list is ok
         #connections_list = self.flights_resp_dal.get_connections_in_area(area)
         connections_list = "AMS,CDG"
         if len(connections_list) == 0:
