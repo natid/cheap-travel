@@ -18,6 +18,6 @@ class ConnectionFlightTypes(object):
     def get_flights_for_connection(self):
         flights_requests = []
         for flight_type in self.flight_types:
-            flights_requests.extend(flight_type.get_trip_data_requests())
+            flights_requests.append((flight_type, flight_type.get_trip_data_requests()))
 
         return flights_requests
