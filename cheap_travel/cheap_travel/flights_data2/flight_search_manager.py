@@ -4,7 +4,7 @@ from flights_data2.connection_flight_checks.connection_flight_types import Conne
 from flights_data2.connection_flight_checks.flight_types import TwoOneWaysFlightType, RoundTripFlightType
 from flights_data2.observer import Observable
 import time
-from constants import PENDING
+from constants import PENDING, ERROR_RESPONSE
 
 CONNECTION_KEY_SEPERATOR = "$"
 
@@ -71,7 +71,7 @@ class FlightSearchManager(Observable):
         self.round_trip_flight = RoundTripFlightType(self.trip_data)
         response = self.flight_provider.search_flight(self.trip_data)
 
-        if response:
+        if response and response != ERROR_RESPONSE:
             self.round_trip_flight.set_trip_data_response(self.trip_data.compute_key(), response)
             self.notify_if_cheaper(self.round_trip_flight)
 
@@ -85,7 +85,7 @@ class FlightSearchManager(Observable):
         response1 = self.flight_provider.search_flight(flight1)
         response2 = self.flight_provider.search_flight(flight2)
 
-        if response1 and response2:
+        if response1 and response1 != ERROR_RESPONSE and response2 and response2 != ERROR_RESPONSE:
             two_one_ways_trip_flight.set_trip_data_response(flight1.compute_key(), response1)
             two_one_ways_trip_flight.set_trip_data_response(flight2.compute_key(), response2)
             self.notify_if_cheaper(two_one_ways_trip_flight)

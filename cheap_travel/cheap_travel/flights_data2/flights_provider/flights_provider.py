@@ -1,5 +1,6 @@
 import time
 from constants import PENDING, ERROR_RESPONSE
+import traceback
 
 class BaseFlightsProvider(object):
     
@@ -14,11 +15,13 @@ class BaseFlightsProvider(object):
 
         try:
             self.flights_resp_dal.set(key, PENDING)
-            flight_data = self.call_provider(self.build_trip(trip_data))
+            flight_data = self.call_provider(self.build_trip_request(trip_data))
             if not flight_data:
                 self.flights_resp_dal.set(key, ERROR_RESPONSE)
                 return
-        except Exception:
+        except Exception as e:
+            traceback.print_exc()
+            print e
             self.flights_resp_dal.set(key, ERROR_RESPONSE)
             return
 

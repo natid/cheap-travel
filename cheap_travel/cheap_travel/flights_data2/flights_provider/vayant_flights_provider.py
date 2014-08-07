@@ -4,7 +4,7 @@ from flights_data2.flights_provider.flights_provider import BaseFlightsProvider
 import urllib2
 from collections import defaultdict
 import zlib
-
+from constants import DATE_FORMAT
 demo_request_json = {
     "SearchRequest":
         {
@@ -40,6 +40,7 @@ class VayantFlightsProvider(BaseFlightsProvider):
         resp = self._decompress_and_extract_json(response)
 
         if resp.has_key('Response') and resp['Response'] == 'Error':
+            print resp
             return None
 
         return resp
@@ -62,9 +63,9 @@ class VayantFlightsProvider(BaseFlightsProvider):
         request_json = demo_request_json.copy()
         trip = list()
 
-        trip.append(self._build_trip(trip_data["origin"], trip_data["dest"], trip_data["depart_dates"]), 1)
-        if trip_data.has_key("return_dates"):
-            trip.append(self._build_trip(trip_data["origin"], trip_data["dest"], trip_data["return_dates"]), 2)
+        trip.append(self._build_trip(trip_data.origin, trip_data.dest, [x.strftime(DATE_FORMAT) for x in trip_data.depart_dates], 1))
+        if hasattr(trip_data,"return_dates") and trip_data.return_dates:
+            trip.append(self._build_trip(trip_data.origin, trip_data.dest, [x.strftime(DATE_FORMAT) for x in trip_data.return_dates], 2))
 
         request_json["SearchRequest"]["TripSegments"] = trip
 
@@ -83,6 +84,7 @@ class VayantFlightsProvider(BaseFlightsProvider):
             for date in dates:
                 trip["DepartureDates"].append({"Date": date})
         else:
+            print type(dates)
             assert False, "wrong dates type"
 
         return trip
