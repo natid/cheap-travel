@@ -76,11 +76,18 @@ class FlightSearchManager(Observable):
 
     def search_two_one_ways(self):
         two_one_ways_trip_flight = TwoOneWaysFlightType(self.trip_data)
-        response = self.flight_provider.search_flight(self.trip_data)
+        flights_to_search = two_one_ways_trip_flight.get_trip_data_requests()
 
-        if response:
-            two_one_ways_trip_flight.set_trip_data_response(response)
-            self.notify_if_cheaper(self.round_trip_flight)
+        flight1 = flights_to_search[0]
+        flight2 = flights_to_search[1]
+
+        response1 = self.flight_provider.search_flight(flight1)
+        response2 = self.flight_provider.search_flight(flight2)
+
+        if response1 and response2:
+            two_one_ways_trip_flight.set_trip_data_response(flight1.compute_key(), response1)
+            two_one_ways_trip_flight.set_trip_data_response(flight2.compute_key(), response2)
+            self.notify_if_cheaper(two_one_ways_trip_flight)
 
     def notify_if_cheaper(self, flight_type):
         updated_flight_data = flight_type.get_final_price()
