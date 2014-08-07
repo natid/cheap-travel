@@ -18,7 +18,8 @@ class BaseFlightType(object):
         self.origin = original_trip_data.origin
         self.dest = original_trip_data.dest
         self.depart_date = original_trip_data.depart_dates[0]
-        self.return_date = original_trip_data.return_dates[0]
+        if original_trip_data.return_dates:
+            self.return_date = original_trip_data.return_dates[0]
         self.connection = connection
         self.relevant_requests = []
         self.relevant_responses = {}
@@ -35,8 +36,9 @@ class BaseFlightType(object):
         return self.relevant_requests
 
     def set_trip_data_request(self, name, trip_data_request):
-        self.name_to_key[name] = trip_data_request.compute_key()
-        self.relevant_requests.append(TripDataRequest(*trip_data_request))
+        request = TripDataRequest(*trip_data_request)
+        self.name_to_key[name] = request.compute_key()
+        self.relevant_requests.append(request)
 
     def get_cheapest_flights_that_can_connect(self, is_one_way_flights, response1, response2, connection):
         cookie = [0 for _ in range(4)]

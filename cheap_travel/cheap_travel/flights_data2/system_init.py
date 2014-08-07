@@ -5,8 +5,8 @@ from flights_data2.queue_manager import MemoryQueueManager
 from flights_data2.thread_pool2 import ThreadPool
 
 
-if __name__ == "__main__":
-    flight_provider = VayantFlightsProvider()
-    flight_resp_dal = FlightsRespDAL()
-    thread_pool = ThreadPool(MemoryQueueManager(), THREAD_POOL_SIZE)
+#if __name__ == "__main__":
+flight_resp_dal = FlightsRespDAL()
+flight_provider = VayantFlightsProvider(flight_resp_dal)
+thread_pool = ThreadPool(MemoryQueueManager(), THREAD_POOL_SIZE)
 

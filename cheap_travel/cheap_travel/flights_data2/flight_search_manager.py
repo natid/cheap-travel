@@ -29,11 +29,13 @@ class FlightPricesData(object):
 class FlightSearchManager(Observable):
 
     def __init__(self, trip_data, flight_provider, flights_resp_dal, thread_pool):
+        super(FlightSearchManager, self).__init__()
         self.trip_data = trip_data
-        self.origin = trip_data['origin']
-        self.dest = trip_data['dest']
-        self.depart_date = trip_data['depart_dates'][0]
-        self.return_date = trip_data['return_dates'][0]
+        self.origin = trip_data.origin
+        self.dest = trip_data.dest
+        self.depart_date = trip_data.depart_dates[0]
+        if trip_data.return_dates:
+            self.return_date = trip_data.return_dates[0]
         self.flights_resp_dal = flights_resp_dal
         self.flight_provider = flight_provider
         self.flights_prices_data = defaultdict(dict)
@@ -45,8 +47,8 @@ class FlightSearchManager(Observable):
 
     def search_all_flight_combinations(self):
         area = self.flights_resp_dal.get_area_code(self.origin, self.dest)
-        connections_list = self.flights_resp_dal.get_connections_in_area(area)
-
+        #connections_list = self.flights_resp_dal.get_connections_in_area(area)
+        connections_list = "AMS,CDG"
         if len(connections_list) == 0:
             print "couldn't get connection list"
             return None
@@ -69,7 +71,7 @@ class FlightSearchManager(Observable):
         response = self.flight_provider.search_flight(self.trip_data)
 
         if response:
-            self.round_trip_flight.set_response(response)
+            self.round_trip_flight.set_trip_data_response(response)
             self.notify_if_cheaper(self.round_trip_flight)
 
     def search_two_one_ways(self):
@@ -77,7 +79,7 @@ class FlightSearchManager(Observable):
         response = self.flight_provider.search_flight(self.trip_data)
 
         if response:
-            two_one_ways_trip_flight.set_response(response)
+            two_one_ways_trip_flight.set_trip_data_response(response)
             self.notify_if_cheaper(self.round_trip_flight)
 
     def notify_if_cheaper(self, flight_type):
@@ -117,7 +119,7 @@ class FlightSearchManager(Observable):
                 response = self.flights_resp_dal.get(trip_key)
                 self.unfinished_requests.remove(request)
                 if response:
-                    self.connection_flight_data[request].set_response(response)
+                    self.connection_flight_data[request].set_trip_data_response(response)
                     self.notify_if_cheaper(self.connection_flight_data[request])
 
             time.sleep(1)

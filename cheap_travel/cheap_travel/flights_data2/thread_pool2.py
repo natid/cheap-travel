@@ -34,7 +34,7 @@ class ThreadPool(object):
     """Pool of threads consuming tasks from a queue"""
 
     def __init__(self, queue, num_threads=1):
-        self.tasks = queue()
+        self.tasks = queue
         self.workers = []
         for i in xrange(1, num_threads + 1):
             self.workers.append(Worker(self, i))

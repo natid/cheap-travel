@@ -1,4 +1,5 @@
 from dateutil import parser
+from constants import DATE_FORMAT
 
 class TripDataRequest(object):
 
@@ -12,10 +13,11 @@ class TripDataRequest(object):
         words_to_join = [self.origin, self.dest]
 
         for date in self.depart_dates:
-            words_to_join.append(date)
+            words_to_join.append(date.strftime(DATE_FORMAT))
 
-        for date in self.return_dates:
-            words_to_join.append(date)
+        if self.return_dates:
+            for date in self.return_dates:
+                words_to_join.append(date.strftime(DATE_FORMAT))
 
         return "-".join(words_to_join)
 

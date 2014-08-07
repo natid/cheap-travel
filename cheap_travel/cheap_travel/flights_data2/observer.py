@@ -1,6 +1,6 @@
 
 class Observer(object):
-    def update(self, observable, *args, *kwargs):
+    def update(self, observable, *args, **kwargs):
         '''Called when the observed object is
         modified. You call an Observable object's
         notifyObservers method to notify all the
@@ -19,6 +19,6 @@ class Observable(object):
     def remove_observer(self, observer):
         self.observers_list.remove(observer)
 
-    def notify_observers(self, *args, *kwargs):
+    def notify_observers(self, *args, **kwargs):
         for observer in self.observers_list:
-            observer.update(self, *args, *kwargs)
+            observer.update(self, *args, **kwargs)

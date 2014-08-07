@@ -5,7 +5,7 @@ from flights_data2.constants import CONNECTION_DAYS
 class RoundTripFlightType(BaseFlightType):
 
     def calculate_relevant_flights(self):
-        self.set_flight_trip_data("first", (self.origin, self.dest, self.depart_date, self.return_date))
+        self.set_trip_data_request("first", (self.origin, self.dest, [self.depart_date], [self.return_date]))
 
     def get_final_price(self):
         cheapest_price1, cheapest_flight1 = self.get_trip_data_response("first").get_cheapest_flight_and_price()
@@ -17,8 +17,8 @@ class RoundTripFlightType(BaseFlightType):
 class TwoOneWaysFlightType(BaseFlightType):
 
     def calculate_relevant_flights(self):
-        self.set_flight_trip_data("first", (self.origin, self.dest, self.depart_date))
-        self.set_flight_trip_data("second", (self.dest, self.origin, self.return_date))
+        self.set_trip_data_request("first", (self.origin, self.dest, [self.depart_date]))
+        self.set_trip_data_request("second", (self.dest, self.origin, [self.return_date]))
 
     def get_final_price(self):
         cheapest_price1, cheapest_flight1 = self.get_trip_data_response("first").get_cheapest_flight_and_price()
@@ -33,9 +33,9 @@ class ConnectionInTheBeginningFlightType(BaseFlightType):
     def calculate_relevant_flights(self):
         depart_dates = [self.depart_date + timedelta(days=i) for i in range(CONNECTION_DAYS)]
 
-        self.set_flight_trip_data("first", (self.origin, self.connection, self.depart_date))
-        self.set_flight_trip_data("second", (self.connection, self.dest, depart_dates))
-        self.set_flight_trip_data("third", (self.dest, self.origin, self.return_date))
+        self.set_trip_data_request("first", (self.origin, self.connection, [self.depart_date]))
+        self.set_trip_data_request("second", (self.connection, self.dest, depart_dates))
+        self.set_trip_data_request("third", (self.dest, self.origin, [self.return_date]))
 
     def get_final_price(self):
         trip_data_response1 = self.get_trip_data_response("first")
@@ -61,9 +61,9 @@ class ConnectionInTheEndFlightType(BaseFlightType):
     def calculate_relevant_flights(self):
         depart_dates = [self.return_date - timedelta(days=i) for i in range(CONNECTION_DAYS)]
 
-        self.set_flight_trip_data("first", (self.origin, self.dest, self.depart_date))
-        self.set_flight_trip_data("second", (self.dest, self.connection, depart_dates))
-        self.set_flight_trip_data("third", (self.connection, self.origin, self.return_date))
+        self.set_trip_data_request("first", (self.origin, self.dest, [self.depart_date]))
+        self.set_trip_data_request("second", (self.dest, self.connection, depart_dates))
+        self.set_trip_data_request("third", (self.connection, self.origin, [self.return_date]))
 
     def get_final_price(self):
         trip_data_response1 = self.get_trip_data_response("first")
@@ -89,8 +89,8 @@ class TwoConnectionsStayInTheBeginningFlightType(BaseFlightType):
     def calculate_relevant_flights(self):
         depart_dates = [self.depart_date + timedelta(days=i) for i in range(CONNECTION_DAYS)]
 
-        self.set_flight_trip_data("first", (self.origin, self.connection, self.depart_date, self.return_date))
-        self.set_flight_trip_data("second", (self.connection, self.dest, depart_dates, self.return_date))
+        self.set_trip_data_request("first", (self.origin, self.connection, [self.depart_date], [self.return_date]))
+        self.set_trip_data_request("second", (self.connection, self.dest, depart_dates, [self.return_date]))
 
     def get_final_price(self):
         trip_data_response1 = self.get_trip_data_response("first")
@@ -113,8 +113,8 @@ class TwoConnectionsStayInTheEndFlightType(BaseFlightType):
     def calculate_relevant_flights(self):
         depart_dates = [self.return_date - timedelta(days=i) for i in range(CONNECTION_DAYS)]
 
-        self.set_flight_trip_data("first", (self.origin, self.connection, self.depart_date, self.return_date))
-        self.set_flight_trip_data("second", (self.connection, self.dest, depart_dates, self.return_date))
+        self.set_trip_data_request("first", (self.origin, self.connection, [self.depart_date], [self.return_date]))
+        self.set_trip_data_request("second", (self.connection, self.dest, depart_dates, [self.return_date]))
 
     def get_final_price(self):
         trip_data_response1 = self.get_trip_data_response("first")
