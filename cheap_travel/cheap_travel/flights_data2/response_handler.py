@@ -4,7 +4,7 @@ from flights_data2.observer import Observer
 class ResponseHandler(Observer):
 
     def update(self, flight_search_manager, *args, **kwargs):
-        if kwargs['finished'] is True:
+        if 'finished' in kwargs:
             self.handle_finished()
             return
 
