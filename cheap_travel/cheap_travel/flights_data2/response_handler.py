@@ -11,7 +11,7 @@ class ResponseHandler(Observer):
         self.handle_cheap_price(flight_search_manager)
 
     def handle_cheap_price(self, flight_search_manager):
-        print flight_search_manager.flight_response
+        print flight_search_manager.cheapest_flight
 
     def handle_finished(self):
         print "FINISHED!!!"
