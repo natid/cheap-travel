@@ -43,10 +43,10 @@ class ConnectionInTheBeginningFlightType(BaseFlightType):
         trip_data_response3 = self.get_trip_data_response("third")
 
         if trip_data_response1 and trip_data_response2 and trip_data_response3:
-            cheapest_flight1, cheapest_price1, cheapest_flight2, cheapest_price2 = \
+            cheapest_price1, cheapest_flight1, cheapest_price2, cheapest_flight2 = \
                 self.get_cheapest_flights_that_can_connect(True, trip_data_response1, trip_data_response2, self.connection)
 
-            cheapest_flight3, cheapest_price3 = trip_data_response3.get_cheapest_flight_and_price()
+            cheapest_price3, cheapest_flight3 = trip_data_response3.get_cheapest_flight_and_price()
 
             if cheapest_flight1 and cheapest_flight2 and cheapest_flight3:
                 return (cheapest_price1 + cheapest_price2 + cheapest_price3, [cheapest_flight1, cheapest_flight2, cheapest_flight3] )
@@ -71,9 +71,9 @@ class ConnectionInTheEndFlightType(BaseFlightType):
         trip_data_response3 = self.get_trip_data_response("third")
 
         if trip_data_response1 and trip_data_response2 and trip_data_response3:
-            cheapest_flight1, cheapest_price1 = trip_data_response1.get_cheapest_flight_and_price()
+            cheapest_price1, cheapest_flight1 = trip_data_response1.get_cheapest_flight_and_price()
 
-            cheapest_flight2, cheapest_price2, cheapest_flight3, cheapest_price3 = \
+            cheapest_price2, cheapest_flight2, cheapest_price3, cheapest_flight3 = \
                 self.get_cheapest_flights_that_can_connect(True, trip_data_response2, trip_data_response3, self.connection)
 
             if cheapest_flight1 and cheapest_flight2 and cheapest_flight3:

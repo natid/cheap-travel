@@ -48,13 +48,13 @@ class BaseFlightType(object):
         while first_flight and second_flight:
             if is_one_way_flights:
                 if first_flight.legs[-1].flights_can_connect(second_flight.legs[0]):
-                    return first_flight["price"], first_flight, second_flight["price"], second_flight
+                    return first_flight.price, first_flight, second_flight.price, second_flight
             else:
                 connection_arrival, connection_departure = first_flight.get_dest_arrival_and_departure_flights_in_two_way(connection)
                 if connection_arrival.flights_can_connect(second_flight.legs[0]) and \
                    second_flight.legs[-1].flights_can_connect(connection_departure):
 
-                    return first_flight["price"], first_flight, second_flight["price"], second_flight
+                    return first_flight.price, first_flight, second_flight.price, second_flight
 
             first_flight, second_flight = self._get_next_flights(response1, response2, cookie)
         return None, None, None ,None

@@ -51,8 +51,9 @@ class ThreadPool(object):
 
     def task_ended(self, worker_number, task_number, duration):
         self.task_number -= 1
+        """
         print "worker number {0} finished task number {1}, " \
               "Number of open tasks is {2}, " \
               "the duration is {3}".format(worker_number, task_number, self.task_number, duration)
-
+        """
 

@@ -132,9 +132,6 @@ class FlightSearchManager(Observable):
             for request in self.unfinished_requests[:]:
                 connection, trip_key = request.split(CONNECTION_KEY_SEPERATOR)
                 response = self.flights_resp_dal.get(trip_key)
-                if response:
-                    print "response for {} is {}".format(trip_key, response)
-                    a=5
                 if response and response != PENDING:
                     self.unfinished_requests.remove(request)
                     self.connection_flight_data[request].set_trip_data_response(trip_key, response)
