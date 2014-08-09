@@ -27,7 +27,7 @@ class BaseFlightsProvider(object):
 
         data_to_save = self.convert_provider_response(flight_data)
         self.save_flight_to_db(key, data_to_save)
-        return cached_resp
+        return data_to_save
 
     def get_flight_from_cache(self, key):
         cached_resp = self.flights_resp_dal.get(key)

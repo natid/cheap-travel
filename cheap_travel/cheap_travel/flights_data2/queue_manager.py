@@ -9,6 +9,9 @@ class BaseQueueManager(object):
     def get(self):
         pass
 
+    def task_done(self):
+        pass
+
 
 class MemoryQueueManager(BaseQueueManager):
 
@@ -19,7 +22,10 @@ class MemoryQueueManager(BaseQueueManager):
         self.queue.put(data)
 
     def get(self):
-        self.queue.get()
+        return self.queue.get()
+
+    def task_done(self):
+        self.queue.task_done()
 
 
 

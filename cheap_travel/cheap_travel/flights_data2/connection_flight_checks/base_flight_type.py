@@ -51,8 +51,8 @@ class BaseFlightType(object):
                     return first_flight["price"], first_flight, second_flight["price"], second_flight
             else:
                 connection_arrival, connection_departure = first_flight.get_dest_arrival_and_departure_flights_in_two_way(connection)
-                if connection_arrival.flights_can_connect(second_flight["legs"][0]) and \
-                   second_flight["legs"][-1].flights_can_connect(connection_departure):
+                if connection_arrival.flights_can_connect(second_flight.legs[0]) and \
+                   second_flight.legs[-1].flights_can_connect(connection_departure):
 
                     return first_flight["price"], first_flight, second_flight["price"], second_flight
 
@@ -63,7 +63,7 @@ class BaseFlightType(object):
         found, first_index, second_index, first_base_index, second_base_index = self._get_next_indexes(cookie, response1, response2)
         if not found:
             return None, None
-        cookie = first_index, second_index, first_base_index, second_base_index
+        cookie[:4] = first_index, second_index, first_base_index, second_base_index
         return response1.trips[first_index], response2.trips[second_index]
 
     def _get_next_indexes(self, cookie, response1, response2):
@@ -77,7 +77,7 @@ class BaseFlightType(object):
                 return False, None, None, None, None
             update_second = True
 
-        elif second_index != constants.MAX_FLIGHTS_PER_TRIP - 1:
+        elif second_index != MAX_FLIGHTS_PER_TRIP - 1:
             first_jump_price = response1.trips[first_index + 1].price - response1.trips[first_base_index].price
 
             second_jump_price = response2.trips[second_index + 1].price - response2.trips[second_base_index].price

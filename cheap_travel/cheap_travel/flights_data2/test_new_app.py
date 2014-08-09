@@ -3,7 +3,10 @@ from system_init import thread_pool, flight_provider, flight_resp_dal
 from response_handler import ResponseHandler
 from datetime import datetime
 from trip_data import TripDataRequest
+
+
 if __name__ == "__main__":
+    thread_pool.start()
     response_handler = ResponseHandler()
     trip_data_request = TripDataRequest("TLV", "BKK", [datetime(2014,8,12)], [datetime(2014,8,22)])
     flight_search_manager = FlightSearchManager(trip_data_request, flight_provider, flight_resp_dal, thread_pool)

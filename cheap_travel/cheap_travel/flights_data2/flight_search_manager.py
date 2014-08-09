@@ -1,5 +1,6 @@
 from collections import defaultdict
 from threading import Thread
+import threading
 from flights_data2.connection_flight_checks.connection_flight_types import ConnectionFlightTypes
 from flights_data2.connection_flight_checks.flight_types import TwoOneWaysFlightType, RoundTripFlightType
 from flights_data2.observer import Observable
@@ -44,6 +45,7 @@ class FlightSearchManager(Observable):
         self.connection_flight_data = {}
         self.unfinished_requests = []
         self.cheapest_flight = None
+        self.mutex = threading.RLock()
 
 
     def search_all_flight_combinations(self):
@@ -57,7 +59,7 @@ class FlightSearchManager(Observable):
 
         self.search_base_trips_flight()
         self.send_requests_to_flight_provider(connections_list)
-        self.updtae_responses()
+        self.update_responses()
         self.notify_observers(finished=True)
 
 
@@ -92,10 +94,14 @@ class FlightSearchManager(Observable):
             self.notify_if_cheaper(two_one_ways_trip_flight)
 
     def notify_if_cheaper(self, flight_type):
-        updated_flight_data = flight_type.get_final_price()
-        if self.cheapest_flight is None or updated_flight_data[0] < self.cheapest_flight[0]:
-            self.cheapest_flight = updated_flight_data
-            self.notify_observers()
+        self.mutex.acquire()
+        try:
+            updated_flight_data = flight_type.get_final_price()
+            if self.cheapest_flight is None or (updated_flight_data[0] and updated_flight_data[0] < self.cheapest_flight[0]):
+                self.cheapest_flight = updated_flight_data
+                self.notify_observers()
+        finally:
+            self.mutex.release()
 
     def build_flights_prices_data(self ,connections_list):
         for single_connection in connections_list:
@@ -120,12 +126,15 @@ class FlightSearchManager(Observable):
 
         ]
 
-    def updtae_responses(self):
+    def update_responses(self):
         self.unfinished_requests = self.connection_flight_data.keys()
         while self.unfinished_requests:
             for request in self.unfinished_requests[:]:
                 connection, trip_key = request.split(CONNECTION_KEY_SEPERATOR)
                 response = self.flights_resp_dal.get(trip_key)
+                if response:
+                    print "response for {} is {}".format(trip_key, response)
+                    a=5
                 if response and response != PENDING:
                     self.unfinished_requests.remove(request)
                     self.connection_flight_data[request].set_trip_data_response(trip_key, response)
