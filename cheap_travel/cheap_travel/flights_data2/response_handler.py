@@ -8,10 +8,10 @@ class ResponseHandler(Observer):
             self.handle_finished()
             return
 
-        self.handle_cheap_price(flight_search_manager)
+        self.handle_cheap_price(flight_search_manager, kwargs['flight_type'])
 
-    def handle_cheap_price(self, flight_search_manager):
-        print flight_search_manager.cheapest_flight
+    def handle_cheap_price(self, flight_search_manager, flight_type=None):
+        print flight_search_manager.cheapest_flight, flight_type.get_flight_type_str()
 
     def handle_finished(self):
         print "FINISHED!!!"
