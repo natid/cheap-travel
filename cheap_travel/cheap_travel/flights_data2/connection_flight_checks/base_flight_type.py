@@ -71,13 +71,12 @@ class BaseFlightType(object):
         first_jump_price = second_jump_price = 0
 
         first_index, second_index, first_base_index, second_base_index = cookie
-
-        if first_index == MAX_FLIGHTS_PER_TRIP - 1:
-            if second_index == MAX_FLIGHTS_PER_TRIP - 1:
+        if first_index == MAX_FLIGHTS_PER_TRIP - 1 or first_index == len(response1.trips) - 1:
+            if second_index == MAX_FLIGHTS_PER_TRIP - 1 or second_index == len(response2.trips) - 1:
                 return False, None, None, None, None
             update_second = True
 
-        elif second_index != MAX_FLIGHTS_PER_TRIP - 1:
+        elif second_index != MAX_FLIGHTS_PER_TRIP - 1 and second_index != len(response2.trips) - 1:
             first_jump_price = response1.trips[first_index + 1].price - response1.trips[first_base_index].price
 
             second_jump_price = response2.trips[second_index + 1].price - response2.trips[second_base_index].price
