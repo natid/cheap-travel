@@ -44,6 +44,15 @@ class Trip(object):
                 return self.legs[i], self.legs[i+1]
         return None, None
 
+    def __repr__(self):
+        to_return = "\n"
+        to_return += "price:{}".format(self.price)
+        for leg in self.legs:
+            to_return +="\nleg: "
+            to_return += str(leg)
+
+        return to_return
+
 class Flight(object):
     def __init__(self, origin, dest, departure, arrival, carrier, flight_number):
         self.origin = origin
@@ -52,6 +61,13 @@ class Flight(object):
         self.arrival = arrival
         self.carrier = carrier
         self.flight_number = flight_number
+
+    def __repr__(self):
+        to_return = ""
+        to_return += "origin={}, dest={}, departure={}, arrival={}, carrier={}, flight_number={}" \
+            .format(self.origin, self.dest, self.departure, self.arrival, self.carrier, self.flight_number)
+
+        return to_return
 
     def flights_can_connect(self, flight):
         if not flight:
