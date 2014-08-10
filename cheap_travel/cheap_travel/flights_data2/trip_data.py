@@ -53,6 +53,7 @@ class Trip(object):
 
         return to_return
 
+
 class Flight(object):
     def __init__(self, origin, dest, departure, arrival, carrier, flight_number):
         self.origin = origin
