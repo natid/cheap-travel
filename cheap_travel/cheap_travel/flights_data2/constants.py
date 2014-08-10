@@ -1,14 +1,12 @@
 CONNECTION_DAYS = 4
 THREAD_POOL_SIZE = 20
-MAX_FLIGHTS_PER_TRIP = 4
+MAX_FLIGHTS_PER_TRIP = 20
 DATE_FORMAT = "%Y-%m-%d"
 
 PENDING = "pending"
 ERROR_RESPONSE = "No Result"
 
 
-MAX_FLIGHTS_PER_TRIP = 20
-CONNECTION_DAYS = 4
 
 # areas are in form of ([left upper corner], [right upper corner], [left bottom corner], [right bottom corner]], area index)
 # all coordinates are in (latitude, longitude)
