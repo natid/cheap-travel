@@ -31,7 +31,7 @@ class BaseFlightsProvider(object):
 
     def get_flight_from_cache(self, key):
         cached_resp = self.flights_resp_dal.get(key)
-        while self.flights_resp_dal.has_key(key) and cached_resp is None:
+        while self.flights_resp_dal.has_key(key) and cached_resp == PENDING:
             time.sleep(5)
             cached_resp = self.flights_resp_dal.get(key)
         return cached_resp

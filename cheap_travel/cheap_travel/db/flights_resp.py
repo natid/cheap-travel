@@ -1,8 +1,7 @@
 from pymongo import MongoClient
-import constants
 from shapely.geometry import Polygon, Point
 
-from constants import ERROR_RESPONSE
+from constants import ERROR_RESPONSE, PENDING
 
 class FlightsRespDAL(object):
 
@@ -15,6 +14,8 @@ class FlightsRespDAL(object):
         #remove all keys without values
         self.flights_collection.remove({"value": None})
         self.flights_collection.remove({"value": ERROR_RESPONSE})
+        self.flights_collection.remove({"value": PENDING})
+
 
         self.airport_collection = db.airport_collection
         self.airport_collection.create_index("airport_code")

@@ -51,7 +51,7 @@ class BaseFlightType(object):
                     return first_flight.price, first_flight, second_flight.price, second_flight
             else:
                 connection_arrival, connection_departure = first_flight.get_dest_arrival_and_departure_flights_in_two_way(connection)
-                if connection_arrival.flights_can_connect(second_flight.legs[0]) and \
+                if connection_arrival and connection_arrival.flights_can_connect(second_flight.legs[0]) and \
                    second_flight.legs[-1].flights_can_connect(connection_departure):
 
                     return first_flight.price, first_flight, second_flight.price, second_flight
