@@ -1,5 +1,5 @@
 from flights_data2.trip_data import TripDataRequest, TripDataResponse
-from constants import ERROR_RESPONSE, MAX_FLIGHTS_PER_TRIP
+from flights_data2.constants import ERROR_RESPONSE, MAX_FLIGHTS_PER_TRIP
 class BaseFlightType(object):
 
     # These are the 3 functions that the inheriting class should implement

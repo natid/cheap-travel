@@ -1,5 +1,5 @@
 import time
-from constants import PENDING, ERROR_RESPONSE
+from flights_data2.constants import PENDING, ERROR_RESPONSE
 import traceback
 
 class BaseFlightsProvider(object):

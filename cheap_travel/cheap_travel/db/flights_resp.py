@@ -1,7 +1,7 @@
 from pymongo import MongoClient
 from shapely.geometry import Polygon, Point
 
-from constants import ERROR_RESPONSE, PENDING
+from flights_data2.constants import ERROR_RESPONSE, PENDING
 
 class FlightsRespDAL(object):
 

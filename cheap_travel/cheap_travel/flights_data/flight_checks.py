@@ -1,7 +1,7 @@
 from datetime import timedelta
 
 from dateutil import parser
-import constants
+from flights_data2 import constants
 from flights_data.async_infrastructure.async_response import AsyncResponse, AsyncMultiResponse
 from flights_data.async_infrastructure.response_collector import ResponseCollector
 

@@ -4,7 +4,7 @@ from flights_data2.flights_provider.flights_provider import BaseFlightsProvider
 import urllib2
 from collections import defaultdict
 import zlib
-from constants import DATE_FORMAT
+from flights_data2.constants import DATE_FORMAT
 demo_request_json = {
     "SearchRequest":
         {
