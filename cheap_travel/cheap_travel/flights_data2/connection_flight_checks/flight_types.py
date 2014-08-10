@@ -97,7 +97,7 @@ class TwoConnectionsStayInTheBeginningFlightType(BaseFlightType):
         trip_data_response2 = self.get_trip_data_response("second")
 
         if trip_data_response1 and trip_data_response2:
-            cheapest_flight1, cheapest_price1, cheapest_flight2, cheapest_price2 = \
+            cheapest_price1, cheapest_flight1, cheapest_price2, cheapest_flight2 = \
                 self.get_cheapest_flights_that_can_connect(False, trip_data_response1, trip_data_response2, self.connection)
 
             if cheapest_flight1 and cheapest_flight2:
@@ -121,7 +121,7 @@ class TwoConnectionsStayInTheEndFlightType(BaseFlightType):
         trip_data_response2 = self.get_trip_data_response("second")
 
         if trip_data_response1 and trip_data_response2:
-            cheapest_flight1, cheapest_price1, cheapest_flight2, cheapest_price2 = \
+            cheapest_price1, cheapest_flight1, cheapest_price2, cheapest_flight2 = \
                 self.get_cheapest_flights_that_can_connect(False, trip_data_response1, trip_data_response2, self.connection)
 
             if cheapest_flight1 and cheapest_flight2:
