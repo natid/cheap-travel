@@ -99,7 +99,7 @@ class FlightSearchManager(Observable):
             updated_flight_data = flight_type.get_final_price()
             if (self.cheapest_flight is None and updated_flight_data[0]) or (updated_flight_data[0] and updated_flight_data[0] < self.cheapest_flight[0]):
                 self.cheapest_flight = updated_flight_data
-                self.notify_observers()
+                self.notify_observers(flight_type=flight_type)
         finally:
             self.mutex.release()
 
