@@ -52,7 +52,9 @@ class FlightSearchManager(Observable):
         area = self.flights_resp_dal.get_area_code(self.origin, self.dest)
         #TODO - don't forget to uncomment this after the connection list is ok
         #connections_list = self.flights_resp_dal.get_connections_in_area(area)
-        connections_list = "AMS","CDG"
+        connections_list = u'CPH', u'CTU', u'DOH', u'CMB', u'IST', u'CAI', u'KUL', u'DEL', u'CAN', u'MUC', u'PEK', u'FRA', u'SIN', u'BAH', u'AMM', u'KWI', u'BKK', u'MNL', u'PVG', u'SGN', u'AMS', u'HKG', u'BWN', u'SVO', u'TPE', u'ICN', u'HAN', u'AUH', u'ADD', u'LHR', u'HEL', u'ZRH', u'RUH', u'CDG', u'VIE', u'MAN', u'XMN', u'MAA', u'MCT', u'DXB', u'ARN', u'BOM'
+
+        #connections_list = "AMS","CDG"
         if len(connections_list) == 0:
             print "couldn't get connection list"
             return None
