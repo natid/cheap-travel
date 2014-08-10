@@ -33,12 +33,10 @@ demo_request_json = {
 class VayantFlightsProvider(BaseFlightsProvider):
 
     def call_provider(self, request):
-
         header = {"Content-Type": "application/JSON ", "Accept-encoding": "gzip"}
         req = urllib2.Request("http://fs-json.demo.vayant.com:7080/", data=json.dumps(request), headers=header)
         response = urllib2.urlopen(req)
         resp = self._decompress_and_extract_json(response)
-
         if resp.has_key('Response') and resp['Response'] == 'Error':
             print resp
             return None
@@ -65,7 +63,7 @@ class VayantFlightsProvider(BaseFlightsProvider):
 
         trip.append(self._build_trip(trip_data.origin, trip_data.dest, [x.strftime(DATE_FORMAT) for x in trip_data.depart_dates], 1))
         if hasattr(trip_data,"return_dates") and trip_data.return_dates:
-            trip.append(self._build_trip(trip_data.origin, trip_data.dest, [x.strftime(DATE_FORMAT) for x in trip_data.return_dates], 2))
+            trip.append(self._build_trip(trip_data.dest, trip_data.origin, [x.strftime(DATE_FORMAT) for x in trip_data.return_dates], 2))
 
         request_json["SearchRequest"]["TripSegments"] = trip
 
@@ -94,10 +92,10 @@ class VayantFlightsProvider(BaseFlightsProvider):
             return None
 
         trips = []
-
         for single_vayant_response in flight_data["Journeys"]:
             trip = dict()
             trip["price"] = single_vayant_response[0]["Price"]["Total"]["Amount"]
+
             trip["legs"] = []
 
             for single_leg in single_vayant_response[0]["Flights"]:
@@ -113,6 +111,3 @@ class VayantFlightsProvider(BaseFlightsProvider):
 
             trips.append(trip)
         return trips
-
-
-
