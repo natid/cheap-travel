@@ -18,7 +18,6 @@ class TripDataRequest(object):
         if self.return_dates:
             for date in self.return_dates:
                 words_to_join.append(date.strftime(DATE_FORMAT))
-
         return "-".join(words_to_join)
 
 class TripDataResponse(object):

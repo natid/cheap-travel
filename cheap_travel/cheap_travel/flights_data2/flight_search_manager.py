@@ -61,7 +61,7 @@ class FlightSearchManager(Observable):
             return None
 
         self.search_base_trips_flight()
-        self.send_requests_to_flight_provider(connections_list)
+        self.send_requests_to_flight_provider(connections_list[0])
         self.update_responses()
         self.notify_observers(finished=True)
 
