@@ -78,7 +78,6 @@ def scrap_connections():
     for area in areas:
         flight_resp_dal.add_connections_to_area(area, areas_conn[area])
 
-
-
 if __name__ == "__main__":
     scrap_connections()
+

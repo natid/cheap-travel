@@ -1,12 +1,17 @@
 from pymongo import MongoClient
 from shapely.geometry import Polygon, Point
 
-from flights_data2.constants import ERROR_RESPONSE, PENDING
+from flights_data2.constants import *
+
+import json
+import boto.sqs
+from boto.sqs.message import Message
 
 class FlightsRespDAL(object):
 
     def __init__(self):
-        client = MongoClient('localhost', 27017)
+        #client = MongoClient('localhost', 27017)
+        client = MongoClient("ec2-54-72-89-102.eu-west-1.compute.amazonaws.com", 27017)
         db = client.flights_db
 
         self.flights_collection = db.flights_collection
@@ -28,9 +33,12 @@ class FlightsRespDAL(object):
 
         self.results_collection = db.results_collection
 
+        boto_conn = boto.sqs.connect_to_region("eu-west-1")
+
+        self.boto_queueu = boto_conn.get_queue("flight-responses")
 
     def _get_area(self, lat, lng):
-        for area in constants.areas:
+        for area in areas:
             if self._is_in_area(lat, lng, area[0]):
                 return area[1]
 
@@ -43,6 +51,10 @@ class FlightsRespDAL(object):
 
     def insert_results_to_db(self, key, data):
         self.results_collection.update({"key": key}, {"$push": {"connections": data}}, upsert=True)
+        # to write a message
+        m = Message()
+        m.set_body(json.dumps({"key":key,"data":data}))
+        self.boto_queueu.write(m)
 
     def get_results(self, key):
         data = self.results_collection.find_one({"key": key})
@@ -96,7 +108,7 @@ class FlightsRespDAL(object):
     def get_connections_in_area(self, area):
         data = self.connections_collection.find_one({"area": area})
         if data:
-            return data["connections"][0]
+            return data["connections"]
         else:
             return
 
@@ -111,3 +123,5 @@ class FlightsRespDAL(object):
             return "%s-%s" % (origin_area["area"], dest_area["area"])
         else:
             return
+
+x = FlightsRespDAL()

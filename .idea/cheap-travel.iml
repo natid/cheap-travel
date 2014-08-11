@@ -5,7 +5,7 @@
       <sourceFolder url="file://$MODULE_DIR$/cheap_travel/cheap_travel" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/cheap_travel" isTestSource="false" />
     </content>
-    <orderEntry type="inheritedJdk" />
+    <orderEntry type="jdk" jdkName="Python 2.7.8 (C:\Python27\python.exe)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
 </module>

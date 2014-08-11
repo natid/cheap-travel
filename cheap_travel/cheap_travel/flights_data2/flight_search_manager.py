@@ -4,6 +4,7 @@ import threading
 from flights_data2.connection_flight_checks.connection_flight_types import ConnectionFlightTypes
 from flights_data2.connection_flight_checks.flight_types import TwoOneWaysFlightType, RoundTripFlightType
 from flights_data2.observer import Observable
+from flights_data2.system_init import flight_resp_dal
 import time
 from constants import PENDING, ERROR_RESPONSE
 
@@ -51,8 +52,8 @@ class FlightSearchManager(Observable):
     def search_all_flight_combinations(self):
         area = self.flights_resp_dal.get_area_code(self.origin, self.dest)
         #TODO - don't forget to uncomment this after the connection list is ok
-        #connections_list = self.flights_resp_dal.get_connections_in_area(area)
-        connections_list = u'CPH', u'CTU', u'DOH', u'CMB', u'IST', u'CAI', u'KUL', u'DEL', u'CAN', u'MUC', u'PEK', u'FRA', u'SIN', u'BAH', u'AMM', u'KWI', u'BKK', u'MNL', u'PVG', u'SGN', u'AMS', u'HKG', u'BWN', u'SVO', u'TPE', u'ICN', u'HAN', u'AUH', u'ADD', u'LHR', u'HEL', u'ZRH', u'RUH', u'CDG', u'VIE', u'MAN', u'XMN', u'MAA', u'MCT', u'DXB', u'ARN', u'BOM'
+        connections_list = self.flights_resp_dal.get_connections_in_area(area)
+        #connections_list = u'CPH', u'CTU', u'DOH', u'CMB', u'IST', u'CAI', u'KUL', u'DEL', u'CAN', u'MUC', u'PEK', u'FRA', u'SIN', u'BAH', u'AMM', u'KWI', u'BKK', u'MNL', u'PVG', u'SGN', u'AMS', u'HKG', u'BWN', u'SVO', u'TPE', u'ICN', u'HAN', u'AUH', u'ADD', u'LHR', u'HEL', u'ZRH', u'RUH', u'CDG', u'VIE', u'MAN', u'XMN', u'MAA', u'MCT', u'DXB', u'ARN', u'BOM'
 
         #connections_list = "AMS","CDG"
         if len(connections_list) == 0:
@@ -99,11 +100,22 @@ class FlightSearchManager(Observable):
         self.mutex.acquire()
         try:
             updated_flight_data = flight_type.get_final_price()
+            self._add_response_to_db(flight_type, updated_flight_data)
             if (self.cheapest_flight is None and updated_flight_data[0]) or (updated_flight_data[0] and updated_flight_data[0] < self.cheapest_flight[0]):
                 self.cheapest_flight = updated_flight_data
                 self.notify_observers(flight_type=flight_type)
         finally:
             self.mutex.release()
+
+    def _add_response_to_db(self, flight_type, updated_flight_data):
+        if updated_flight_data and updated_flight_data[0] and updated_flight_data[1]:
+            key = flight_type.original_trip_data.compute_key()
+            result_for_db = dict()
+            result_for_db["type"] = flight_type.get_flight_type_str()
+            result_for_db["price"] = updated_flight_data[0]
+            result_for_db["flight"] = [x.to_dict() for x in updated_flight_data[1]]
+            flight_resp_dal.insert_results_to_db(key, result_for_db)
+
 
     def build_flights_prices_data(self ,connections_list):
         for single_connection in connections_list:

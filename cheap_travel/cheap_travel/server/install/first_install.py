@@ -38,7 +38,8 @@ def insert_airports_to_db(flights_dal):
                     new_dict["area"] = flights_dal._get_area(lat, lng)
                     if new_dict["area"] != -1:
                         flights_dal.airport_collection.insert(new_dict)
-            except:
+            except Exception as e:
+                print e
                 continue
 
 

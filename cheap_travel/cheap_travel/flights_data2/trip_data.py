@@ -53,6 +53,10 @@ class Trip(object):
 
         return to_return
 
+    def to_dict(self):
+        to_return = self.__dict__
+        to_return["legs"] = [x.to_dict() for x in self.legs]
+        return to_return
 
 class Flight(object):
     def __init__(self, origin, dest, departure, arrival, carrier, flight_number):
@@ -69,6 +73,9 @@ class Flight(object):
             .format(self.origin, self.dest, self.departure, self.arrival, self.carrier, self.flight_number)
 
         return to_return
+
+    def to_dict(self):
+        return self.__dict__
 
     def flights_can_connect(self, flight):
         if not flight:
