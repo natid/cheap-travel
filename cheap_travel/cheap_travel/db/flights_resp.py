@@ -34,7 +34,6 @@ class FlightsRespDAL(object):
         self.results_collection = db.results_collection
 
         boto_conn = boto.sqs.connect_to_region("eu-west-1")
-
         self.boto_queueu = boto_conn.get_queue("flight-responses")
 
     def _get_area(self, lat, lng):
@@ -123,5 +122,3 @@ class FlightsRespDAL(object):
             return "%s-%s" % (origin_area["area"], dest_area["area"])
         else:
             return
-
-x = FlightsRespDAL()
