@@ -5,10 +5,8 @@ from datetime import datetime
 from trip_data import TripDataRequest
 
 if __name__ == "__main__":
-    thread_pool.start()
     response_handler = ResponseHandler()
-    trip_data_request = TripDataRequest("TLV", "MNL", [datetime(2014,11,12)], [datetime(2014,11,22)])
+    trip_data_request = TripDataRequest("TLV", "BKK", [datetime(2014,11,10)], [datetime(2014,11,20)])
     flight_search_manager = FlightSearchManager(trip_data_request, flight_provider, flight_resp_dal, thread_pool)
     flight_search_manager.add_observer(response_handler)
     flight_search_manager.search_all_flight_combinations()
-

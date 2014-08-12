@@ -11,7 +11,7 @@ class FlightsRespDAL(object):
 
     def __init__(self):
         #client = MongoClient('localhost', 27017)
-        client = MongoClient("ec2-54-72-89-102.eu-west-1.compute.amazonaws.com", 27017)
+        client = MongoClient("ec2-54-77-119-35.eu-west-1.compute.amazonaws.com", 27017)
         db = client.flights_db
 
         self.flights_collection = db.flights_collection
@@ -51,9 +51,10 @@ class FlightsRespDAL(object):
     def insert_results_to_db(self, key, data):
         self.results_collection.update({"key": key}, {"$push": {"connections": data}}, upsert=True)
         # to write a message
-        m = Message()
-        m.set_body(json.dumps({"key":key,"data":data}))
-        self.boto_queueu.write(m)
+        if self.boto_queueu:
+            m = Message()
+            m.set_body(json.dumps({"key":key,"data":data}))
+            self.boto_queueu.write(m)
 
     def get_results(self, key):
         data = self.results_collection.find_one({"key": key})
@@ -76,7 +77,7 @@ class FlightsRespDAL(object):
 
     def get(self, key):
         db_value = self.flights_collection.find_one({"key": key})
-        if db_value:
+        if db_value and db_value["value"]:
             return db_value["value"]
         return None
 

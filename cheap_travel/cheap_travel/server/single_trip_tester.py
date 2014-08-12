@@ -29,11 +29,11 @@ def get_dict_key(origin, dest, depart_date, return_date):
 def get_cheapest_flight(final_prices):
     found = False
     if final_prices:
-        for flight in final_prices[0]:
-            if "Round Trip" in flight[0]:
-                round_trip_price = cheapest_trip_price = flight[1]
-                cheapest_flight = flight[2]
-                cheapest_type = flight[0]
+        for flight in final_prices:
+            if "Round Trip" in flight["type"]:
+                round_trip_price = cheapest_trip_price = flight["price"]
+                cheapest_flight = flight["flight"]
+                cheapest_type = flight["type"]
                 found  = True
                 break
         if not found:
@@ -41,12 +41,11 @@ def get_cheapest_flight(final_prices):
             return None, None, None, None
 
 
-        for options in final_prices:
-            for price in options:
-                if price[1] < cheapest_trip_price:
-                    cheapest_type = price[0]
-                    cheapest_trip_price = price[1]
-                    cheapest_flight = price[2]
+        for flight in final_prices:
+            if flight["price"] < cheapest_trip_price:
+                cheapest_type = flight["type"]
+                cheapest_trip_price = flight["price"]
+                cheapest_flight = flight["flight"]
 
         return round_trip_price, cheapest_trip_price, cheapest_flight, cheapest_type
     else:

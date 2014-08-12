@@ -10,3 +10,4 @@ flight_resp_dal = FlightsRespDAL()
 flight_provider = VayantFlightsProvider(flight_resp_dal)
 thread_pool = ThreadPool(MemoryQueueManager(), THREAD_POOL_SIZE)
 
+thread_pool.start()

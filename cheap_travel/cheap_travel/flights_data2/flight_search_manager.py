@@ -124,13 +124,14 @@ class FlightSearchManager(Observable):
 
     def send_requests_to_flight_provider(self, connections_list):
         for single_connection in connections_list:
-            connection_flight_types = ConnectionFlightTypes(self.trip_data, single_connection)
-            trips_data_and_flight_types = connection_flight_types.get_flights_for_connection()
-            for flight_type, trips_data in trips_data_and_flight_types:
-                for trip_data in trips_data:
-                    self.pool.add_task(self.flight_provider.search_flight, trip_data)
-                    key = CONNECTION_KEY_SEPERATOR.join([single_connection, trip_data.compute_key()])
-                    self.connection_flight_data[key] = flight_type
+            if self.dest != single_connection != self.origin:
+                connection_flight_types = ConnectionFlightTypes(self.trip_data, single_connection)
+                trips_data_and_flight_types = connection_flight_types.get_flights_for_connection()
+                for flight_type, trips_data in trips_data_and_flight_types:
+                    for trip_data in trips_data:
+                        self.pool.add_task(self.flight_provider.search_flight, trip_data)
+                        key = CONNECTION_KEY_SEPERATOR.join([single_connection, trip_data.compute_key()])
+                        self.connection_flight_data[key] = flight_type
 
     def get_flight_provider_request_list(self, connection):
         return [

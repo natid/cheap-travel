@@ -4,7 +4,7 @@ from flights_data2.flights_provider.flights_provider import BaseFlightsProvider
 import urllib2
 from collections import defaultdict
 import zlib
-from flights_data2.constants import DATE_FORMAT
+from flights_data2.constants import DATE_FORMAT, ERROR_RESPONSE
 demo_request_json = {
     "SearchRequest":
         {
@@ -39,6 +39,7 @@ class VayantFlightsProvider(BaseFlightsProvider):
         resp = self._decompress_and_extract_json(response)
         if resp.has_key('Response') and resp['Response'] == 'Error':
             print resp
+            print request
             return None
 
         return resp
@@ -88,9 +89,6 @@ class VayantFlightsProvider(BaseFlightsProvider):
         return trip
 
     def convert_provider_response(self, flight_data):
-        if flight_data.has_key('Response') and flight_data['Response'] == 'Error':
-            return None
-
         trips = []
         for single_vayant_response in flight_data["Journeys"]:
             trip = dict()
@@ -110,4 +108,6 @@ class VayantFlightsProvider(BaseFlightsProvider):
                 trip["legs"].append(leg)
 
             trips.append(trip)
+        if not trips:
+            return ERROR_RESPONSE
         return trips
